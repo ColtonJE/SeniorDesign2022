@@ -10,7 +10,7 @@
   byte escFL = 35;
   byte escFR = 33;
   byte escBL = 31;
-  byte escBR = 31;
+  byte escBR = 29;
   // Initialize ESCs (Done as Servos to facilitate PWM signals)
   Servo ESC_FL;
   Servo ESC_FR;
@@ -28,17 +28,29 @@ void setup() {
 
 void loop() {
   // servo test
-  delay(5000);
-  while(true){
-    ESC_FR.write(500);
-    ESC_FL.write(500);
-    ESC_BR.write(500);
-    ESC_BL.write(500);
+  int mSpeed = 1000;
+  delay(2000);
+  ESC_FR.writeMicroseconds(1000);
+  ESC_FL.writeMicroseconds(1000);
+  ESC_BR.writeMicroseconds(1000);
+  ESC_BL.writeMicroseconds(1000);
+  delay(2000);
+  ESC_FR.writeMicroseconds(2000);
+  ESC_FL.writeMicroseconds(2000);
+  ESC_BR.writeMicroseconds(2000);
+  ESC_BL.writeMicroseconds(2000);
+  delay(3000);
+  do{
+    mSpeed += 100;
+    ESC_FR.writeMicroseconds(mSpeed);
+    ESC_FL.writeMicroseconds(mSpeed);
+    ESC_BR.writeMicroseconds(mSpeed);
+    ESC_BL.writeMicroseconds(mSpeed);
     delay(1000);
-    ESC_FR.write(0);
-    ESC_FL.write(0);
-    ESC_BR.write(0);
-    ESC_BL.write(0);
-    delay(1000);
-  }
+  }while( mSpeed < 2000 );
+  ESC_FR.writeMicroseconds(1000);
+  ESC_FL.writeMicroseconds(1000);
+  ESC_BR.writeMicroseconds(1000);
+  ESC_BL.writeMicroseconds(1000);
+ exit(0);
 }
