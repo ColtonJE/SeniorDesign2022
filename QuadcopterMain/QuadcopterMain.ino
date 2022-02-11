@@ -27,6 +27,18 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-
+  // servo test
+  delay(5000);
+  while(true){
+    ESC_FR.write(500);
+    ESC_FL.write(500);
+    ESC_BR.write(500);
+    ESC_BL.write(500);
+    delay(1000);
+    ESC_FR.write(0);
+    ESC_FL.write(0);
+    ESC_BR.write(0);
+    ESC_BL.write(0);
+    delay(1000);
+  }
 }
