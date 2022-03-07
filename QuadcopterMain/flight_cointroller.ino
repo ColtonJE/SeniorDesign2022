@@ -456,9 +456,15 @@ void calibrateMpu6050() {
         gyro_offset[Z] += gyro_raw[Z];
 
         // Generate low throttle pulse to init ESC and prevent them beeping
-        PORTD |= B11110000;      // Set pins #4 #5 #6 #7 HIGH
+        digitalWrite(29,HIGH);
+		digitalWrite(31,HIGH);
+		digitalWrite(33,HIGH);
+		digitalWrite(35,HIGH);
         delayMicroseconds(1000); // Wait 1000µs
-        PORTD &= B00001111;      // Then set LOW
+        digitalWrite(29,LOW);
+		digitalWrite(31,LOW);
+		digitalWrite(33,LOW);
+		digitalWrite(35,LOW);
 
         // Just wait a bit before next loop
         delay(3);
