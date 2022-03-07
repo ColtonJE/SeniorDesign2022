@@ -125,15 +125,18 @@ int battery_voltage;
 void setup() {
     // Start I2C communication
     Wire.begin();
-    TWBR = 12; // Set the I2C clock speed to 400kHz.
+    Wire.setClock(400000) // set I2C speed to 400000 Hz
 
     // Turn LED on during setup
     pinMode(13, OUTPUT);
     digitalWrite(13, HIGH);
 
-    // Set pins #4 #5 #6 #7 as outputs
-    DDRD |= B11110000;
-
+    //esc output pins set to outputs
+	DDRD |= B01000000;
+	DDRA |= B10000000;
+	DDRC |= B00001010;
+	
+	
     setupMpu6050Registers();
 
     calibrateMpu6050();
@@ -199,20 +202,28 @@ void applyMotorSpeed() {
     // Update loop timer
     loop_timer = now;
 
-    // Set pins #4 #5 #6 #7 HIGH
-    PORTD |= B11110000;
-
-    // Wait until all pins #4 #5 #6 #7 are LOW
-    while (PORTD >= 16) {
+    // Set pins 29, 31, 33, 35 HIGH
+    //PORTD |= B01000000;
+	//PORTA |= B10000000;
+	//PORTC |= B00001010;
+	digitalWrite(29,HIGH);
+	digitalWrite(31,HIGH);
+	digitalWrite(33,HIGH);
+	digitalWrite(35,HIGH);
+	
+    // Wait until all pins 29 31 33 35 are LOW
+    //while (PORTD == B01000000 || PORTA == B10000000 || PORTC == B00001010;) 
+	while (digitalRead(29) == 1 || digitalRead(31) == 1 || digitalRead(33) == 1 || digitalRead(35) == 1;) {
         now        = micros();
         difference = now - loop_timer;
 
-        if (difference >= pulse_length_esc1) PORTD &= B11101111; // Set pin #4 LOW
-        if (difference >= pulse_length_esc2) PORTD &= B11011111; // Set pin #5 LOW
-        if (difference >= pulse_length_esc3) PORTD &= B10111111; // Set pin #6 LOW
-        if (difference >= pulse_length_esc4) PORTD &= B01111111; // Set pin #7 LOW
+        if (difference >= pulse_length_esc1) digitalWrite(29,LOW); // Set pin #29 LOW
+        if (difference >= pulse_length_esc2) digitalWrite(31,LOW); // Set pin #31 LOW
+        if (difference >= pulse_length_esc3) digitalWrite(33,LOW); // Set pin #33 LOW
+        if (difference >= pulse_length_esc4) digitalWrite(35,LOW); // Set pin #35 LOW
     }
-}
+} //<- stopped here
+
 
 /**
  * Request raw values from MPU6050.
