@@ -203,13 +203,13 @@ void applyMotorSpeed() {
     loop_timer = now;
 
     // Set pins 29, 31, 33, 35 HIGH
-    //PORTD |= B01000000;
-	//PORTA |= B10000000;
-	//PORTC |= B00001010;
-	digitalWrite(29,HIGH);
-	digitalWrite(31,HIGH);
-	digitalWrite(33,HIGH);
-	digitalWrite(35,HIGH);
+    PORTD |= B01000000;
+	PORTA |= B10000000;
+	PORTC |= B00001010;
+	//digitalWrite(29,HIGH);
+	//digitalWrite(31,HIGH);
+	//digitalWrite(33,HIGH);
+	//digitalWrite(35,HIGH);
 	
     // Wait until all pins 29 31 33 35 are LOW
     //while (PORTD == B01000000 || PORTA == B10000000 || PORTC == B00001010;) 
@@ -217,12 +217,12 @@ void applyMotorSpeed() {
         now        = micros();
         difference = now - loop_timer;
 
-        if (difference >= pulse_length_esc1) digitalWrite(29,LOW); // Set pin #29 LOW
-        if (difference >= pulse_length_esc2) digitalWrite(31,LOW); // Set pin #31 LOW
-        if (difference >= pulse_length_esc3) digitalWrite(33,LOW); // Set pin #33 LOW
-        if (difference >= pulse_length_esc4) digitalWrite(35,LOW); // Set pin #35 LOW
+        if (difference >= pulse_length_esc1) PORTD &= B10111111; //digitalWrite(29,LOW); // Set pin #29 LOW
+        if (difference >= pulse_length_esc2) PORTA &= B01111111; //digitalWrite(31,LOW); // Set pin #31 LOW
+        if (difference >= pulse_length_esc3) PORTC &= B11111101; //digitalWrite(33,LOW); // Set pin #33 LOW
+        if (difference >= pulse_length_esc4) PORTC &= B11110111; //digitalWrite(35,LOW); // Set pin #35 LOW
     }
-} //<- stopped here
+} 
 
 
 /**
@@ -456,15 +456,21 @@ void calibrateMpu6050() {
         gyro_offset[Z] += gyro_raw[Z];
 
         // Generate low throttle pulse to init ESC and prevent them beeping
-        digitalWrite(29,HIGH);
-		digitalWrite(31,HIGH);
-		digitalWrite(33,HIGH);
-		digitalWrite(35,HIGH);
-        delayMicroseconds(1000); // Wait 1000µs
-        digitalWrite(29,LOW);
-		digitalWrite(31,LOW);
-		digitalWrite(33,LOW);
-		digitalWrite(35,LOW);
+        //digitalWrite(29,HIGH);
+		//digitalWrite(31,HIGH);
+		//digitalWrite(33,HIGH);
+		//digitalWrite(35,HIGH);
+        PORTD |= B01000000;
+		PORTA |= B10000000;
+		PORTC |= B00001010;
+		delayMicroseconds(1000); // Wait 1000µs
+		PORTD &= B10111111;
+		PORTA &= B01111111;
+		PORTC &= B11110101;
+        //digitalWrite(29,LOW);
+		//digitalWrite(31,LOW);
+		//digitalWrite(33,LOW);
+		//digitalWrite(35,LOW);
 
         // Just wait a bit before next loop
         delay(3);
