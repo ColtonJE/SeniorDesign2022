@@ -13,8 +13,16 @@ const byte slaveAddress[5] = {'R','x','A','A','A'};
 
 RF24 radio(CE_PIN, CSN_PIN); // Create a Radio
 
-char dataToSend[10] = "Message 0";
-char txNum = '0';
+typedef struct {
+  byte yaw;
+  byte pitch;
+  byte roll;
+  byte throttle;
+}conData;
+
+
+conData dataToSend = {1,1,0,2};
+conData txNum = {69,69,69,69};
 
 
 unsigned long currentMillis;
@@ -54,7 +62,7 @@ void send() {
         // For example if dataToSend was an int sizeof() would correctly return 2
 
     Serial.print("Data Sent ");
-    Serial.print(dataToSend);
+    Serial.print((int)dataToSend.yaw);
     if (rslt) {
         Serial.println("  Acknowledge received");
         updateMessage();
@@ -68,9 +76,9 @@ void send() {
 
 void updateMessage() {
         // so you can see that new data is being sent
-    txNum += 1;
-    if (txNum > '9') {
-        txNum = '0';
+    txNum.yaw += 1;
+    if (txNum.yaw > '9') {
+        txNum.yaw = '0';
     }
-    dataToSend[8] = txNum;
+    dataToSend = txNum;
 }

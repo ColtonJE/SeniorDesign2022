@@ -18,7 +18,7 @@ typedef struct {
   byte throttle;
 }conData;
 
-conData Rx; // this must match dataToSend in the TX
+conData dataReceived; // this must match dataToSend in the TX
 bool newData = false;
 
 //===========
@@ -45,7 +45,7 @@ void loop() {
 
 void getData() {
     if ( radio.available() ) {
-        radio.read( &Rx, sizeof(Rx) );
+        radio.read( &dataReceived, sizeof(dataReceived) );
         newData = true;
     }
 }
@@ -53,10 +53,7 @@ void getData() {
 void showData() {
     if (newData == true) {
         Serial.print("Data received ");
-        Serial.println(Rx.yaw);
-        Serial.println(Rx.pitch);
-        Serial.println(Rx.roll);
-        Serial.println(Rx.throttle);
+        Serial.println(dataReceived.yaw);
         newData = false;
     }
 }
