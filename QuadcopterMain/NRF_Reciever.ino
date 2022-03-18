@@ -18,7 +18,7 @@ struct conData {
   byte yaw;
   byte pitch;
   byte roll;
-  byte throttle
+  byte throttle;
 }
 
 //===========
