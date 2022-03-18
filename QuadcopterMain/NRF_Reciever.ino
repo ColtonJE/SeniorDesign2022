@@ -14,6 +14,13 @@ RF24 radio(CE_PIN, CSN_PIN);
 char dataReceived[10]; // this must match dataToSend in the TX
 bool newData = false;
 
+struct conData {
+  byte yaw;
+  byte pitch;
+  byte roll;
+  byte throttle
+}
+
 //===========
 
 void setup() {
