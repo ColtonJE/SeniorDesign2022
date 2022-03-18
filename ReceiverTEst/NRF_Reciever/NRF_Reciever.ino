@@ -11,15 +11,15 @@ const byte thisSlaveAddress[5] = {'R','x','A','A','A'};
 
 RF24 radio(CE_PIN, CSN_PIN);
 
-char dataReceived[10]; // this must match dataToSend in the TX
-bool newData = false;
-
-struct conData {
+typedef struct {
   byte yaw;
   byte pitch;
   byte roll;
   byte throttle;
-}
+}conData;
+
+conData Rx; // this must match dataToSend in the TX
+bool newData = false;
 
 //===========
 
@@ -45,7 +45,7 @@ void loop() {
 
 void getData() {
     if ( radio.available() ) {
-        radio.read( &dataReceived, sizeof(dataReceived) );
+        radio.read( &Rx, sizeof(Rx) );
         newData = true;
     }
 }
@@ -53,7 +53,10 @@ void getData() {
 void showData() {
     if (newData == true) {
         Serial.print("Data received ");
-        Serial.println(dataReceived);
+        Serial.println(Rx.yaw);
+        Serial.println(Rx.pitch);
+        Serial.println(Rx.roll);
+        Serial.println(Rx.throttle);
         newData = false;
     }
 }
