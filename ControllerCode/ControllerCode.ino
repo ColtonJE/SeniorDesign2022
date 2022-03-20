@@ -21,16 +21,27 @@ typedef struct {
 //==========================================
 
 //Radio Setup ==============================
-const byte thisSlaveAddress[5] = {'R','x','A','A','A'};
-
+//sets the channel to transmit on
+const byte slaveAddress[5] = {'R','x','A','A','A'};
+//defines where the radio is connected
 RF24 radio(CE_PIN, CSN_PIN);
-
-conData dataRe
+//variable used that is sent via radio
+conData sendData;
+//variables used for transmit frequency
+unsigned long currentMillis;
+unsigned long prevMillis;
+unsigned long txIntervalMillis = 1000; // send once per second
 //==========================================
 
 void setup() {
-  
-
+  //start the serial monitor
+  Serial.begin(9600);
+  Serial.println("SimpleTx Starting");
+  //start the radio and set send rate
+  radio.begin();
+  radio.setDataRate( RF24_250KBPS );
+  radio.setRetries(3,5); // delay, count
+  radio.openWritingPipe(slaveAddress);
 }
 
 void loop() {
