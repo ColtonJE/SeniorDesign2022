@@ -45,6 +45,21 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-
+  //read the values from the joysticks
+  //A0 = yaw, A1 = pitch, A2 = roll, A3 = throttle
+  sendData.yaw      = map( analogRead(A0), 0, 1024, 255, 0 ); //map values inverted because joystick is upside down
+  senData.pitch     = map( analogRead(A1), 0, 1024, 0, 255 ); 
+  sendData.roll     = map( analogRead(A2), 0, 1024, 0, 255 );
+  sendData.throttle = map( analogRead(A3), 0, 1024, 255, 0 ); //map values inverted because joystick is upside down
+  //For testing ============================
+  Serial.println("Conroller Data: ");
+  Serial.println("Yaw: " + sendData.yaw + "\nPitch: " + sendData.pitch + "\nRoll: " + sendData.roll + "\nThrottle: " + sendData.throttle );
+  //========================================
+  //send data
+  bool result;
+  result = radio.write( &sendData, sizeof(sendData) );
+  //check for acknowledgment ==============
+  if(result) Serial.println( "ACK" );
+  else Serial.println( "TxFailed" );
+  //=======================================
 }
