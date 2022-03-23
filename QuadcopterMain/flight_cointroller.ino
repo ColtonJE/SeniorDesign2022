@@ -219,7 +219,7 @@ void loop() {
 void getData() {
     if ( radio.available() ) {
         radio.read( &dataReceived, sizeof(dataReceived) );
-        newData = true;
+        newData = true; //dont forget to set to false
     }
 }
 
