@@ -782,7 +782,7 @@ bool isBatteryConnected() {
  * @see https://www.arduino.cc/en/Reference/PortManipulation
  * @see https://www.firediy.fr/article/utiliser-sa-radiocommande-avec-un-arduino-drone-ch-6
  */
-ISR() {
+void ISR() {
         current_time = micros();
 
         // Channel 1 -------------------------------------------------
