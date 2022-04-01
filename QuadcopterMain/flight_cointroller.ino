@@ -257,28 +257,28 @@ void getData() {
 
 //working on this rn
 void Rxthreshholding(){
-	if(dataReceived.yaw > threshholds.yaw + 5 || dataReceived.yaw < threshholds.yaw - 5){
+	if(dataReceived.yaw > threshholds.yaw + 3 || dataReceived.yaw < threshholds.yaw - 3){
 		digitalWrite(62, HIGH);
 	}
 	else{
 		digitalWrite(62, LOW);	
 	}
 	
-	if(dataReceived.pitch > threshholds.pitch + 5 || dataReceived.pitch < threshholds.pitch - 5){ // add values to account for noise,unsure of val
+	if(dataReceived.pitch > threshholds.pitch + 3 || dataReceived.pitch < threshholds.pitch - 3){ // add values to account for noise,unsure of val
 		digitalWrite(63, HIGH);
 	}
 	else{
 		digitalWrite(63, LOW);
 	}
 	
-	if(dataReceived.roll > threshholds.roll + 5 || dataReceived.roll < threshholds.roll - 5){ //add values to account for noise,unsure of val
+	if(dataReceived.roll > threshholds.roll + 3 || dataReceived.roll < threshholds.roll - 3){ //add values to account for noise,unsure of val
 		digitalWrite(64, HIGH);
 	}
 	else{
 		digitalWrite(64, LOW);
 	}
 	
-	if(dataReceived.throttle > prev_throtle + 5 || dataReceived.throttle < prev_throttle - 5){
+	if(dataReceived.throttle > prev_throtle + 3 || dataReceived.throttle < prev_throttle - 3){
 		digitalWrite(65, HIGH);
 	}
 	else{
