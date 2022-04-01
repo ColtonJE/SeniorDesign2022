@@ -224,6 +224,11 @@ void setup() {
  */
 //dont forget to call getdata and threshhold
 void loop() {
+	
+	getdata();
+	
+	Rxthreshholding();
+	
     // 1. First, read raw values from MPU-6050
     readSensor();
 
