@@ -48,6 +48,9 @@ bool newData = false;
 #define STARTING 1
 #define STARTED  2
 
+
+void myRoutine();
+
 //Rx threshhold values, not sure exactly what they need to be yet
 volatile byte prev_yaw = 127;
 volatile byte prev_pitch = 127;
@@ -154,7 +157,7 @@ int battery_voltage;
 void setup() {
     // Start I2C communication
     Wire.begin();
-    Wire.setClock(400000) // set I2C speed to 400000 Hz
+    Wire.setClock(400000); // set I2C speed to 400000 Hz
     
     //settup Rx 
     Serial.begin(9600);
@@ -198,10 +201,10 @@ void setup() {
     //PCMSK0 |= (1 << PCINT1); // Set PCINT1 (digital input 9) to trigger an interrupt on state change
     //PCMSK0 |= (1 << PCINT2); // Set PCINT2 (digital input 10)to trigger an interrupt on state change
     //PCMSK0 |= (1 << PCINT3); // Set PCINT3 (digital input 11)to trigger an interrupt on state change
-    attachInterrupt(digitalPinToInterrupt(62), ISR, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(63), ISR, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(64), ISR, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(65), ISR, CHANGE);
+attachInterrupt(digitalPinToInterrupt(62), myRoutine, CHANGE);
+attachInterrupt(digitalPinToInterrupt(63), myRoutine, CHANGE);
+attachInterrupt(digitalPinToInterrupt(64), myRoutine, CHANGE);
+attachInterrupt(digitalPinToInterrupt(65), myRoutine, CHANGE);
     
 	
     period = (1000000/FREQ) ; // Sampling period in µs
@@ -225,7 +228,7 @@ void setup() {
 //dont forget to call getdata and threshhold
 void loop() {
 	
-	getdata();
+	getData();
 	
 	Rxthreshholding();
 	
@@ -283,7 +286,7 @@ void Rxthreshholding(){
 		digitalWrite(64, LOW);
 	}
 	
-	if(dataReceived.throttle > prev_throtle + 3 || dataReceived.throttle < prev_throttle - 3){
+	if(dataReceived.throttle > prev_throttle + 3 || dataReceived.throttle < prev_throttle - 3){
 		digitalWrite(65, HIGH);
 	}
 	else{
@@ -336,7 +339,7 @@ void applyMotorSpeed() {
 	
     // Wait until all pins 29 31 33 35 are LOW
     //while (PORTD == B01000000 || PORTA == B10000000 || PORTC == B00001010;) 
-	while (digitalRead(29) == 1 || digitalRead(31) == 1 || digitalRead(33) == 1 || digitalRead(35) == 1;) {
+	while (digitalRead(29) == 1 || digitalRead(31) == 1 || digitalRead(33) == 1 || digitalRead(35) == 1) {
         now        = micros();
         difference = now - loop_timer;
 
@@ -782,7 +785,7 @@ bool isBatteryConnected() {
  * @see https://www.arduino.cc/en/Reference/PortManipulation
  * @see https://www.firediy.fr/article/utiliser-sa-radiocommande-avec-un-arduino-drone-ch-6
  */
-void ISR() {
+void myRoutine() {
         current_time = micros();
 
         // Channel 1 -------------------------------------------------
