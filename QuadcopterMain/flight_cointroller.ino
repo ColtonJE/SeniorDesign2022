@@ -224,19 +224,26 @@ void loop() {
     applyMotorSpeed();
 }
 
+//radio functions
 void getData() {
     if ( radio.available() ) {
         radio.read( &dataReceived, sizeof(dataReceived) );
-        newData = true; //dont forget to set to false
+        newData = true;
     }
 }
-
-
 
 // void showData() {
 //     if (newData == true) {
 //         Serial.print("Data received ");
-//         Serial.println(dataReceived.yaw);
+//         Serial.print("\nYaw: " );
+//         Serial.print((int)dataReceived.yaw);
+//         Serial.print("\nPitch: ");
+//         Serial.print((int)dataReceived.pitch);
+//         Serial.print("\nRoll: ");
+//         Serial.print((int)dataReceived.roll);
+//         Serial.print("\nThrottle: ");
+//         Serial.print((int)dataReceived.throttle);
+//         Serial.print("\n");
 //         newData = false;
 //     }
 // }
