@@ -309,7 +309,7 @@ void showData() {
         Serial.print("\nThrottle: ");
         Serial.print((int)dataReceived.throttle);
         Serial.print("\n");
-        newData = false;
+        
     }
 }
 
