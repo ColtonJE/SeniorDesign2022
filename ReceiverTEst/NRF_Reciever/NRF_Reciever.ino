@@ -53,7 +53,15 @@ void getData() {
 void showData() {
     if (newData == true) {
         Serial.print("Data received ");
-        Serial.println(dataReceived.yaw);
+        Serial.print("\nYaw: " );
+        Serial.print((int)dataReceived.yaw);
+        Serial.print("\nPitch: ");
+        Serial.print((int)dataReceived.pitch);
+        Serial.print("\nRoll: ");
+        Serial.print((int)dataReceived.roll);
+        Serial.print("\nThrottle: ");
+        Serial.print((int)dataReceived.throttle);
+        Serial.print("\n");
         newData = false;
     }
 }
