@@ -229,7 +229,7 @@ attachInterrupt(digitalPinToInterrupt(65), myRoutine, CHANGE);
 void loop() {
 	
 	getData();
-	
+	showData();
 	Rxthreshholding();
 	
     // 1. First, read raw values from MPU-6050
@@ -297,21 +297,21 @@ void Rxthreshholding(){
 	newData = false;
 }
 
-// void showData() {
-//     if (newData == true) {
-//         Serial.print("Data received ");
-//         Serial.print("\nYaw: " );
-//         Serial.print((int)dataReceived.yaw);
-//         Serial.print("\nPitch: ");
-//         Serial.print((int)dataReceived.pitch);
-//         Serial.print("\nRoll: ");
-//         Serial.print((int)dataReceived.roll);
-//         Serial.print("\nThrottle: ");
-//         Serial.print((int)dataReceived.throttle);
-//         Serial.print("\n");
-//         newData = false;
-//     }
-// }
+void showData() {
+    if (newData == true) {
+        Serial.print("Data received ");
+        Serial.print("\nYaw: " );
+        Serial.print((int)dataReceived.yaw);
+        Serial.print("\nPitch: ");
+        Serial.print((int)dataReceived.pitch);
+        Serial.print("\nRoll: ");
+        Serial.print((int)dataReceived.roll);
+        Serial.print("\nThrottle: ");
+        Serial.print((int)dataReceived.throttle);
+        Serial.print("\n");
+        newData = false;
+    }
+}
 
 /**
  * Generate servo-signal on digital pins #4 #5 #6 #7 with a frequency of 250Hz (4ms period).
