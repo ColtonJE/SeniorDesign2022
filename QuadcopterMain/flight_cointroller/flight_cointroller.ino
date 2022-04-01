@@ -6,8 +6,8 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 
-#define CE_PIN   9
-#define CSN_PIN 10
+#define CE_PIN   25
+#define CSN_PIN 23
 
 const byte thisSlaveAddress[5] = {'R','x','A','A','A'};
 
