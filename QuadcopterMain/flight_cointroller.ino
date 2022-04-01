@@ -46,6 +46,11 @@ bool newData = false;
 #define STARTING 1
 #define STARTED  2
 
+//Rx threshhold values, not sure exactly what they need to be yet
+volatile byte prev_yaw = 127;
+volatile byte prev_pitch = 127;
+volatile byte prev_roll = 127;
+volatile byte prev_throttle = 127;
 
 // ---------------- Receiver variables ---------------------------------------
 // Previous state of each channel (HIGH or LOW)
@@ -175,16 +180,21 @@ void setup() {
 
     configureChannelMapping();
 
+	// set output pins so we can manually trigger their interrupts
+	pinMode(62, OUTPUT);
+	pinMode(63, OUTPUT);
+	pinMode(64, OUTPUT);
+	pinMode(65, OUTPUT);
     // Configure interrupts for receiver
     //PCICR  |= (1 << PCIE0);  // Set PCIE0 to enable PCMSK0 scan
     //PCMSK0 |= (1 << PCINT0); // Set PCINT0 (digital input 8) to trigger an interrupt on state change
     //PCMSK0 |= (1 << PCINT1); // Set PCINT1 (digital input 9) to trigger an interrupt on state change
     //PCMSK0 |= (1 << PCINT2); // Set PCINT2 (digital input 10)to trigger an interrupt on state change
     //PCMSK0 |= (1 << PCINT3); // Set PCINT3 (digital input 11)to trigger an interrupt on state change
-    attachInterrupt(digitalPinToInterrupt(62), ISR, HIGH);
-    attachInterrupt(digitalPinToInterrupt(63), ISR, HIGH);
-    attachInterrupt(digitalPinToInterrupt(64), ISR, HIGH);
-    attachInterrupt(digitalPinToInterrupt(65), ISR, HIGH);
+    attachInterrupt(digitalPinToInterrupt(62), ISR, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(63), ISR, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(64), ISR, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(65), ISR, CHANGE);
     
 	
     period = (1000000/FREQ) ; // Sampling period in µs
@@ -200,6 +210,7 @@ void setup() {
 /**
  * Main program loop
  */
+//dont forget to call getdata and threshhold
 void loop() {
     // 1. First, read raw values from MPU-6050
     readSensor();
@@ -230,6 +241,27 @@ void getData() {
         radio.read( &dataReceived, sizeof(dataReceived) );
         newData = true;
     }
+}
+
+//working on this rn
+void Rxthreshholding(){
+	if(dataReceived.yaw != prev_yaw){
+		digitalWrite(62, HIGH);
+	}
+	if(dataReceived.pitch != prev_pitch){
+		digitalWrite(63, HIGH);
+	}
+	if(dataReceived.roll != prev_roll){
+		digitalWrite(64, HIGH);
+	}
+	if(dataReceived.throttle != prev_throttle){
+		digitalWrite(65, HIGH);
+	}
+	prev_yaw = dataReceived.yaw;
+	prev_pitch = dataReceived.pitch;
+	prev_roll = dataReceived.roll;
+	prev_throttle = dataReceived.throttle;
+	newData = false;
 }
 
 // void showData() {
