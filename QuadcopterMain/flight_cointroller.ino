@@ -21,6 +21,8 @@ typedef struct {
   byte throttle;
 }conData;
 
+conData threshholds;
+
 conData dataReceived; // this must match dataToSend in the TX
 bool newData = false;
 
@@ -185,6 +187,11 @@ void setup() {
 	pinMode(63, OUTPUT);
 	pinMode(64, OUTPUT);
 	pinMode(65, OUTPUT);
+	digitalWrite(62, LOW);
+	digitalWrite(63, LOW);
+	digitalWrite(64, LOW);
+	digitalWrite(65, LOW);
+	
     // Configure interrupts for receiver
     //PCICR  |= (1 << PCIE0);  // Set PCIE0 to enable PCMSK0 scan
     //PCMSK0 |= (1 << PCINT0); // Set PCINT0 (digital input 8) to trigger an interrupt on state change
@@ -204,6 +211,11 @@ void setup() {
 
     // Turn LED off now setup is done
     digitalWrite(13, LOW);
+	
+	threshholds.yaw = 127;
+	threshholds.pitch = 127;
+	threshholds.roll = 127;
+	threshholds.throttle = 0;
 }
 
 
@@ -245,21 +257,34 @@ void getData() {
 
 //working on this rn
 void Rxthreshholding(){
-	if(dataReceived.yaw != prev_yaw){
+	if(dataReceived.yaw > threshholds.yaw + 5 || dataReceived.yaw < threshholds.yaw - 5){
 		digitalWrite(62, HIGH);
 	}
-	if(dataReceived.pitch != prev_pitch){
+	else{
+		digitalWrite(62, LOW);	
+	}
+	
+	if(dataReceived.pitch > threshholds.pitch + 5 || dataReceived.pitch < threshholds.pitch - 5){ // add values to account for noise,unsure of val
 		digitalWrite(63, HIGH);
 	}
-	if(dataReceived.roll != prev_roll){
+	else{
+		digitalWrite(63, LOW);
+	}
+	
+	if(dataReceived.roll > threshholds.roll + 5 || dataReceived.roll < threshholds.roll - 5){ //add values to account for noise,unsure of val
 		digitalWrite(64, HIGH);
 	}
-	if(dataReceived.throttle != prev_throttle){
+	else{
+		digitalWrite(64, LOW);
+	}
+	
+	if(dataReceived.throttle > prev_throtle + 5 || dataReceived.throttle < prev_throttle - 5){
 		digitalWrite(65, HIGH);
 	}
-	prev_yaw = dataReceived.yaw;
-	prev_pitch = dataReceived.pitch;
-	prev_roll = dataReceived.roll;
+	else{
+		digitalWrite(65, LOW);	
+	}
+	
 	prev_throttle = dataReceived.throttle;
 	newData = false;
 }
