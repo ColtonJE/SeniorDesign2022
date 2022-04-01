@@ -174,10 +174,10 @@ void setup() {
 	//DDRD |= B0001000000;
 	//DDRA |= B000000000000000000000010000000;
 	//DDRC |= B0000000000000000000000000001010;
-	pinMode(31, OUTPUT);
-	pinMode(33, OUTPUT);
-	pinMode(35, OUTPUT);
-	pinMode(37, OUTPUT);
+	pinMode(30, OUTPUT);
+	pinMode(32, OUTPUT);
+	pinMode(34, OUTPUT);
+	pinMode(36, OUTPUT);
 	
     setupMpu6050Registers();
 
@@ -328,25 +328,25 @@ void applyMotorSpeed() {
     // Update loop timer
     loop_timer = now;
 
-    // Set pins 29, 31, 33, 35 HIGH
+    // Set pins 30, 32, 34, 36 HIGH
     //PORTD |= B01000000;
 	//PORTA |= B10000000;
 	//PORTC |= B00001010;
-	digitalWrite(31,HIGH);
-	digitalWrite(33,HIGH);
-	digitalWrite(35,HIGH);
-	digitalWrite(37,HIGH);
+	digitalWrite(30,HIGH);
+	digitalWrite(32,HIGH);
+	digitalWrite(34,HIGH);
+	digitalWrite(36,HIGH);
 	
-    // Wait until all pins 29 31 33 35 are LOW
+    // Wait until all pins 30 32 34 36 are LOW
     //while (PORTD == B01000000 || PORTA == B10000000 || PORTC == B00001010;) 
-	while (digitalRead(31) == 1 || digitalRead(33) == 1 || digitalRead(35) == 1 || digitalRead(37) == 1) {
+	while (digitalRead(30) == 1 || digitalRead(32) == 1 || digitalRead(34) == 1 || digitalRead(36) == 1) {
         now        = micros();
         difference = now - loop_timer;
 
-        if (difference >= pulse_length_esc1) digitalWrite(31,LOW); //PORTD &= B10111111; // Set pin #31 LOW
-        if (difference >= pulse_length_esc2) digitalWrite(33,LOW); //PORTA &= B01111111; // Set pin #33 LOW
-        if (difference >= pulse_length_esc3) digitalWrite(35,LOW); //PORTC &= B11111101; // Set pin #35 LOW
-        if (difference >= pulse_length_esc4) digitalWrite(37,LOW); //PORTC &= B11110111; // Set pin #37 LOW
+        if (difference >= pulse_length_esc1) digitalWrite(30,LOW); //PORTD &= B10111111; // Set pin #30 LOW
+        if (difference >= pulse_length_esc2) digitalWrite(32,LOW); //PORTA &= B01111111; // Set pin #32 LOW
+        if (difference >= pulse_length_esc3) digitalWrite(34,LOW); //PORTC &= B11111101; // Set pin #34 LOW
+        if (difference >= pulse_length_esc4) digitalWrite(36,LOW); //PORTC &= B11110111; // Set pin #36 LOW
     }
 } 
 
@@ -582,10 +582,10 @@ void calibrateMpu6050() {
         gyro_offset[Z] += gyro_raw[Z];
 
         // Generate low throttle pulse to init ESC and prevent them beeping
-        digitalWrite(31,HIGH);
-	digitalWrite(33,HIGH);
-	digitalWrite(35,HIGH);
-	digitalWrite(37,HIGH);
+        digitalWrite(30,HIGH);
+	digitalWrite(32,HIGH);
+	digitalWrite(34,HIGH);
+	digitalWrite(36,HIGH);
         //PORTD |= B01000000;
 		//PORTA |= B10000000;
 		//PORTC |= B00001010;
@@ -593,10 +593,10 @@ void calibrateMpu6050() {
 		//PORTD &= B10111111;
 		//PORTA &= B01111111;
 		//PORTC &= B11110101;
-        digitalWrite(31,LOW);
-	digitalWrite(33,LOW);
-	digitalWrite(35,LOW);
-	digitalWrite(37,LOW);
+        digitalWrite(30,LOW);
+	digitalWrite(32,LOW);
+	digitalWrite(34,LOW);
+	digitalWrite(36,LOW);
 
         // Just wait a bit before next loop
         delay(3);
