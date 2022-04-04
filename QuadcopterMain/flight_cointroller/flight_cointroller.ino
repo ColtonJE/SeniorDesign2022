@@ -15,16 +15,16 @@ RF24 radio(CE_PIN, CSN_PIN);
 
 //struct for rx
 typedef struct {
-  byte yaw;
-  byte pitch;
-  byte roll;
-  byte throttle;
+  int yaw;
+  int pitch;
+  int roll;
+  int throttle;
 }conData;
 
-conData threshholds;
+conData threshholds = {0,0,0,0};
 conData xData = {0,0,0,0};
 
-conData dataReceived; // this must match dataToSend in the TX
+conData dataReceived = {0,0,0,0}; // this must match dataToSend in the TX
 bool newData = false;
 
 // ------------------- Define some constants for convenience -----------------
@@ -805,45 +805,67 @@ void myRoutine() {
         current_time = micros();
 
         // Channel 1 -------------------------------------------------
-        if (digitalRead(62)) {                                        // pin 62 high ?
-            if (previous_state[CHANNEL1] == LOW) {                     //  changed from 0 to 1 (rising edge)
+        if (digitalRead(62)) 
+        {                                        // pin 62 high ?
+            if (previous_state[CHANNEL1] == LOW) 
+            {                     //  changed from 0 to 1 (rising edge)
                 previous_state[CHANNEL1] = HIGH;                       // Save current state
                 timer[CHANNEL1] = current_time;                        // Save current time
             }
-        } else if (previous_state[CHANNEL1] == HIGH) {                 //  changed from 1 to 0 (falling edge)
+            
+        } 
+        else if (previous_state[CHANNEL1] == HIGH) 
+        {                 //  changed from 1 to 0 (falling edge)
             previous_state[CHANNEL1] = LOW;                            // Save current state
             pulse_length[CHANNEL1] = current_time - timer[CHANNEL1];   // Calculate pulse duration & save it
         }
 
         // Channel 2 -------------------------------------------------
-        if (digitalRead(63)) {                                        // pin 63 high ?
-            if (previous_state[CHANNEL2] == LOW) {                     //  changed from 0 to 1 (rising edge)
+        if (digitalRead(63)) 
+        {                                        // pin 63 high ?
+            if (previous_state[CHANNEL2] == LOW) 
+            {                     //  changed from 0 to 1 (rising edge)
                 previous_state[CHANNEL2] = HIGH;                       // Save current state
                 timer[CHANNEL2] = current_time;                        // Save current time
             }
-        } else if (previous_state[CHANNEL2] == HIGH) {                 //  changed from 1 to 0 (falling edge)
+            
+        } 
+        else if (previous_state[CHANNEL2] == HIGH) 
+        {                 //  changed from 1 to 0 (falling edge)
             previous_state[CHANNEL2] = LOW;                            // Save current state
             pulse_length[CHANNEL2] = current_time - timer[CHANNEL2];   // Calculate pulse duration & save it
         }
+        
 
         // Channel 3 -------------------------------------------------
-        if (digitalRead(64)) {                                        // pin 64 high ?
-            if (previous_state[CHANNEL3] == LOW) {                     //  changed from 0 to 1 (rising edge)
+        if (digitalRead(64)) 
+        {                                        // pin 64 high ?
+            if (previous_state[CHANNEL3] == LOW) 
+            {                     //  changed from 0 to 1 (rising edge)
                 previous_state[CHANNEL3] = HIGH;                       // Save current state
                 timer[CHANNEL3] = current_time;                        // Save current time
             }
-        } else if (previous_state[CHANNEL3] == HIGH) {                 //  changed from 1 to 0 (falling edge)
+            
+        } 
+        else if (previous_state[CHANNEL3] == HIGH) 
+        {                 //  changed from 1 to 0 (falling edge)
             previous_state[CHANNEL3] = LOW;                            // Save current state
             pulse_length[CHANNEL3] = current_time - timer[CHANNEL3];   // Calculate pulse duration & save it
         }
 
+        
         // Channel 4 -------------------------------------------------
-        if (digitalRead(65)) {                                        // pin 65 high ?
-            if (previous_state[CHANNEL4] == LOW) {                     //  changed from 0 to 1 (rising edge)
+        if (digitalRead(65)) 
+        {                                        // pin 65 high ?
+            if (previous_state[CHANNEL4] == LOW) 
+            {                     //  changed from 0 to 1 (rising edge)
                 previous_state[CHANNEL4] = HIGH;                       // Save current state
                 timer[CHANNEL4] = current_time;                        // Save current time
             }
-        } else if (previous_state[CHANNEL4] == HIGH) {                 //  changed from 1 to 0 (falling edge)
+            
+        } 
+        else if (previous_state[CHANNEL4] == HIGH) 
+        {                 //  changed from 1 to 0 (falling edge)
             previous_state[CHANNEL4] = LOW;                            // Save current state
             pulse_length[CHANNEL4] = current_time - timer[CHANNEL4];   // Calculate pulse duration & save it
         }
