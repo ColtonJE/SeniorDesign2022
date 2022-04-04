@@ -21,9 +21,9 @@ typedef struct {
   float throttle;
 }conData;
 
-conData threshholds;
+conData threshholds = {0,0,0,0};
 conData xData = {0,0,0,0};
-conData dataReceived; // this must match dataToSend in the TX
+conData dataReceived = {0,0,0,0}; // this must match dataToSend in the TX
 bool newData = false;
 
 // ------------------- Define some constants for convenience -----------------
