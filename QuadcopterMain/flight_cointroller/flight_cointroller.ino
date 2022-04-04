@@ -263,34 +263,102 @@ void getData() {
     }
 }
 
-//working on this rn
+//old one for reference
+// void Rxthreshholding(){
+// 	if(dataReceived.yaw > threshholds.yaw + 3 || dataReceived.yaw < threshholds.yaw - 3){
+// 		digitalWrite(62, HIGH);
+// 	}
+// 	else{
+// 		digitalWrite(62, LOW);	
+// 	}
+	
+// 	if(dataReceived.pitch > threshholds.pitch + 3 || dataReceived.pitch < threshholds.pitch - 3){ // add values to account for noise,unsure of val
+// 		digitalWrite(63, HIGH);
+// 	}
+// 	else{
+// 		digitalWrite(63, LOW);
+// 	}
+	
+// 	if(dataReceived.roll > threshholds.roll + 3 || dataReceived.roll < threshholds.roll - 3){ //add values to account for noise,unsure of val
+// 		digitalWrite(64, HIGH);
+// 	}
+// 	else{
+// 		digitalWrite(64, LOW);
+// 	}
+	
+// 	if(dataReceived.throttle > prev_throttle + 3 || dataReceived.throttle < prev_throttle - 3){
+// 		digitalWrite(65, HIGH);
+// 	}
+// 	else{
+// 		digitalWrite(65, LOW);	
+// 	}
+	
+// 	prev_throttle = dataReceived.throttle;
+// 	newData = false;
+// }
+
 void Rxthreshholding(){
-	if(dataReceived.yaw > threshholds.yaw + 3 || dataReceived.yaw < threshholds.yaw - 3){
+	if(dataReceived.yaw > threshholds.yaw + 3){
 		digitalWrite(62, HIGH);
+		delay(2000);
+		digitalWrite(62, LOW);
+	}
+	else if(dataReceived.yaw < threshholds.yaw - 3){
+		digitalWrite(62, HIGH);
+		delay(1200);
+		digitalWrite(62, LOW);
 	}
 	else{
+		digitalWrite(62, HIGH);
+		delay(1500);
 		digitalWrite(62, LOW);	
 	}
 	
-	if(dataReceived.pitch > threshholds.pitch + 3 || dataReceived.pitch < threshholds.pitch - 3){ // add values to account for noise,unsure of val
+	if(dataReceived.pitch > threshholds.pitch + 3){ // add values to account for noise,unsure of val
 		digitalWrite(63, HIGH);
-	}
-	else{
+		delay(2000);
 		digitalWrite(63, LOW);
 	}
-	
-	if(dataReceived.roll > threshholds.roll + 3 || dataReceived.roll < threshholds.roll - 3){ //add values to account for noise,unsure of val
-		digitalWrite(64, HIGH);
+	if(dataReceived.pitch < threshholds.pitch - 3){ // add values to account for noise,unsure of val
+		digitalWrite(63, HIGH);
+		delay(1200);
+		digitalWrite(63,LOW);
 	}
 	else{
+		digitalWrite(63, HIGH);
+		delay(1500);
+		digitalWrite(63,LOW);
+	}
+	
+	if(dataReceived.roll > threshholds.roll + 3){  //add values to account for noise,unsure of val
+		digitalWrite(64, HIGH);
+		delay(2000);
+		digitalWrite(64, LOW);
+	}
+	else if(dataReceived.roll < threshholds.roll - 3){
+		digitalWrite(64, HIGH);
+		delay(12000);
+		digitalWrite(64, LOW);
+	else{
+		digitalWrite(64, HIGH);
+		delay(1500);
 		digitalWrite(64, LOW);
 	}
 	
-	if(dataReceived.throttle > prev_throttle + 3 || dataReceived.throttle < prev_throttle - 3){
+	if(dataReceived.throttle > prev_throttle + 3){
 		digitalWrite(65, HIGH);
+		delay(2000);
+		digitalWrite(65, LOW);
+	}
+	if else(dataReceived.throttle < prev_throttle - 3){
+		digitalWrite(65, HIGH);
+		delay(12000);
+		digitalWrite(65, LOW);
 	}
 	else{
-		digitalWrite(65, LOW);	
+		digitalWrite(65, HIGH);
+		delay(1500);
+		digitalWrite(65, LOW);
 	}
 	
 	prev_throttle = dataReceived.throttle;
