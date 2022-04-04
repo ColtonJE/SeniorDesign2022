@@ -21,15 +21,11 @@ typedef struct {
   float throttle;
 }conData;
 
-<<<<<<< Updated upstream
-conData threshholds = {0,0,0,0};
-conData xData = {0,0,0,0};
-conData dataReceived = {0,0,0,0}; // this must match dataToSend in the TX
-=======
+
 conData threshholds;
 conData xData;
 conData dataReceived; // this must match dataToSend in the TX
->>>>>>> Stashed changes
+
 bool newData = false;
 
 // ------------------- Define some constants for convenience -----------------
@@ -269,106 +265,56 @@ void loop()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //radio functions
-<<<<<<< Updated upstream
-conData getData() 
-{
-    if ( radio.available() ) 
-    {
-        radio.read( &dataReceived, sizeof(dataReceived) );
-        newData = true;
-    }
-
-=======
 conData getData() {
     if ( radio.available() ) {
         radio.read( &dataReceived, sizeof(dataReceived) );
         newData = true;
     }
->>>>>>> Stashed changes
     return dataReceived;
 }
 
 
-<<<<<<< Updated upstream
 
 //working on this rn
 void Rxthreshholding(conData x)
 {
 	if(x.yaw > threshholds.yaw + 3 || x.yaw < threshholds.yaw - 3){
-=======
-void Rxthreshholding(conData x){
-	if(x.yaw > threshholds.yaw + 3){
-		digitalWrite(62, HIGH);
-		delay(2000);
-		digitalWrite(62, LOW);
-	}
-	else if(x.yaw < threshholds.yaw - 3){
->>>>>>> Stashed changes
 		digitalWrite(62, HIGH);
 	}
 	else{
 		digitalWrite(62, LOW);	
 	}
 	
-<<<<<<< Updated upstream
 	if(x.pitch > threshholds.pitch + 3 || x.pitch < threshholds.pitch - 3){ // add values to account for noise,unsure of val
-=======
-	if(x.pitch > threshholds.pitch + 3){ // add values to account for noise,unsure of val
-		digitalWrite(63, HIGH);
-		delay(2000);
-		digitalWrite(63, LOW);
-	}
-	if(x.pitch < threshholds.pitch - 3){ // add values to account for noise,unsure of val
->>>>>>> Stashed changes
 		digitalWrite(63, HIGH);
 	}
 	else{
 		digitalWrite(63, LOW);
 	}
 	
-<<<<<<< Updated upstream
 	if(x.roll > threshholds.roll + 3 || x.roll < threshholds.roll - 3){ //add values to account for noise,unsure of val
-=======
-	if(x.roll > threshholds.roll + 3){  //add values to account for noise,unsure of val
-		digitalWrite(64, HIGH);
-		delay(2000);
-		digitalWrite(64, LOW);
-	}
-	else if(x.roll < threshholds.roll - 3){
->>>>>>> Stashed changes
 		digitalWrite(64, HIGH);
 	}
 	else{
 		digitalWrite(64, LOW);
 	}
 	
-<<<<<<< Updated upstream
 	if(x.throttle > prev_throttle + 3 || x.throttle < prev_throttle - 3){
-=======
-	if(x.throttle > prev_throttle + 3){
-		digitalWrite(65, HIGH);
-		delay(2000);
-		digitalWrite(65, LOW);
-	}
-	else if(x.throttle < prev_throttle - 3){
->>>>>>> Stashed changes
 		digitalWrite(65, HIGH);
 	}
 	else{
 		digitalWrite(65, LOW);	
 	}
 	
-	prev_throttle = dataReceived.throttle;
+	prev_throttle = xData.throttle;
 	newData = false;
 }
 
-<<<<<<< Updated upstream
+
 void showData(conData x) 
 {
-=======
-void showData(conData x) {
->>>>>>> Stashed changes
-    if (newData == true) {
+    if (newData == true) 
+    {
         Serial.print("Data received ");
         Serial.print("\nYaw: " );
         Serial.print((int)x.yaw);
