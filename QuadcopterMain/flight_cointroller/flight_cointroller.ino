@@ -1,6 +1,6 @@
 
 #include <Wire.h>
-
+#include <SchedulerARMAVR.h>
 //Rx libraries
 #include <SPI.h>
 //#include <nRF24L01.h>
@@ -27,6 +27,8 @@ conData xData;
 conData dataReceived; // this must match dataToSend in the TX
 
 bool newData = false;
+
+
 
 // ------------------- Define some constants for convenience -----------------
 #define CHANNEL1 0
@@ -221,6 +223,9 @@ attachInterrupt(digitalPinToInterrupt(65), myRoutine, CHANGE);
 	threshholds.pitch = 127;
 	threshholds.roll = 127;
 	threshholds.throttle = 0;
+
+  Scheduler.startLoop(loop1);
+ 
 }
 
 
@@ -233,12 +238,15 @@ attachInterrupt(digitalPinToInterrupt(65), myRoutine, CHANGE);
 //dont forget to call getdata and threshhold
 void loop() 
 {
-	
-	xData = getData();
-	showData(xData);
-	Rxthreshholding(xData);
-	
-    // 1. First, read raw values from MPU-6050
+
+  Serial.println("+========In main loop=======+");
+  
+  
+  showData(xData);
+  Rxthreshholding(xData);
+
+  
+// 1. First, read raw values from MPU-6050
     readSensor();
 
     // 2. Calculate angles from gyro & accelerometer's values
@@ -261,7 +269,21 @@ void loop()
     // 6. Apply motors speed
     applyMotorSpeed();
 
+    delay(3000);
 }
+
+void loop1()
+{
+    Serial.println("+========In loop 1=======+");
+
+  xData = getData();
+  
+  delay(1000);
+}
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //radio functions
@@ -315,6 +337,7 @@ void showData(conData x)
 {
     if (newData == true) 
     {
+        Serial.println("\n+----------------------------------------------------+");
         Serial.print("Data received ");
         Serial.print("\nYaw: " );
         Serial.print((int)x.yaw);
@@ -325,6 +348,8 @@ void showData(conData x)
         Serial.print("\nThrottle: ");
         Serial.print((int)x.throttle);
         Serial.print("\n");
+        Serial.println("+----------------------------------------------------+");
+
         
     }
 }
@@ -653,7 +678,7 @@ float minMax(float value, float min_value, float max_value) {
  */
 bool isStarted() {
     // When left stick is moved in the bottom left corner
-    if (status == STOPPED && dataReceived.yaw <= 0 && dataReceived.throttle <= 255) {
+    if (status == STOPPED && dataReceived.yaw <= 5 && dataReceived.throttle <= 5) {
         status = STARTING;
     }
 
@@ -668,7 +693,7 @@ bool isStarted() {
     }
 
     // When left stick is moved in the bottom right corner
-    if (status == STARTED && pulse_length[mode_mapping[YAW]] >= 1988 && pulse_length[mode_mapping[THROTTLE]] <= 1012) {
+    if (status == STARTED && dataReceived.yaw <= 255 && dataReceived.throttle <= 5) {
         status = STOPPED;
         // Make sure to always stop motors when status is STOPPED
         stopAll();
