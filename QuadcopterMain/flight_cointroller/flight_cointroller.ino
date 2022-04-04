@@ -15,16 +15,15 @@ RF24 radio(CE_PIN, CSN_PIN);
 
 //struct for rx
 typedef struct {
-  int yaw;
-  int pitch;
-  int roll;
-  int throttle;
+  float yaw;
+  float pitch;
+  float roll;
+  float throttle;
 }conData;
 
-conData threshholds = {0,0,0,0};
+conData threshholds;
 conData xData = {0,0,0,0};
-
-conData dataReceived = {0,0,0,0}; // this must match dataToSend in the TX
+conData dataReceived; // this must match dataToSend in the TX
 bool newData = false;
 
 // ------------------- Define some constants for convenience -----------------
@@ -260,7 +259,6 @@ void loop()
     // 6. Apply motors speed
     applyMotorSpeed();
 
-    delay(2000);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -276,31 +274,33 @@ conData getData()
     return dataReceived;
 }
 
+
+
 //working on this rn
-void Rxthreshholding(conData dataReceived)
+void Rxthreshholding(conData x)
 {
-	if(dataReceived.yaw > threshholds.yaw + 3 || dataReceived.yaw < threshholds.yaw - 3){
+	if(x.yaw > threshholds.yaw + 3 || x.yaw < threshholds.yaw - 3){
 		digitalWrite(62, HIGH);
 	}
 	else{
 		digitalWrite(62, LOW);	
 	}
 	
-	if(dataReceived.pitch > threshholds.pitch + 3 || dataReceived.pitch < threshholds.pitch - 3){ // add values to account for noise,unsure of val
+	if(x.pitch > threshholds.pitch + 3 || x.pitch < threshholds.pitch - 3){ // add values to account for noise,unsure of val
 		digitalWrite(63, HIGH);
 	}
 	else{
 		digitalWrite(63, LOW);
 	}
 	
-	if(dataReceived.roll > threshholds.roll + 3 || dataReceived.roll < threshholds.roll - 3){ //add values to account for noise,unsure of val
+	if(x.roll > threshholds.roll + 3 || x.roll < threshholds.roll - 3){ //add values to account for noise,unsure of val
 		digitalWrite(64, HIGH);
 	}
 	else{
 		digitalWrite(64, LOW);
 	}
 	
-	if(dataReceived.throttle > prev_throttle + 3 || dataReceived.throttle < prev_throttle - 3){
+	if(x.throttle > prev_throttle + 3 || x.throttle < prev_throttle - 3){
 		digitalWrite(65, HIGH);
 	}
 	else{
@@ -311,18 +311,18 @@ void Rxthreshholding(conData dataReceived)
 	newData = false;
 }
 
-void showData(conData dataReceived) 
+void showData(conData x) 
 {
     if (newData == true) {
         Serial.print("Data received ");
         Serial.print("\nYaw: " );
-        Serial.print((int)dataReceived.yaw);
+        Serial.print((int)x.yaw);
         Serial.print("\nPitch: ");
-        Serial.print((int)dataReceived.pitch);
+        Serial.print((int)x.pitch);
         Serial.print("\nRoll: ");
-        Serial.print((int)dataReceived.roll);
+        Serial.print((int)x.roll);
         Serial.print("\nThrottle: ");
-        Serial.print((int)dataReceived.throttle);
+        Serial.print((int)x.throttle);
         Serial.print("\n");
         
     }
