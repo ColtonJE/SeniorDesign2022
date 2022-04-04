@@ -3,7 +3,7 @@
 
 //Rx libraries
 #include <SPI.h>
-#include <nRF24L01.h>
+//#include <nRF24L01.h>
 #include <RF24.h>
 
 #define CE_PIN   9
@@ -21,6 +21,12 @@ typedef struct {
   byte throttle;
 }conData;
 
+<<<<<<< Updated upstream:QuadcopterMain/flight_cointroller.ino
+=======
+conData threshholds;
+conData xData = {0,0,0,0};
+
+>>>>>>> Stashed changes:QuadcopterMain/flight_cointroller/flight_cointroller.ino
 conData dataReceived; // this must match dataToSend in the TX
 bool newData = false;
 
@@ -192,7 +198,18 @@ void setup() {
 /**
  * Main program loop
  */
+<<<<<<< Updated upstream:QuadcopterMain/flight_cointroller.ino
 void loop() {
+=======
+//dont forget to call getdata and threshhold
+void loop() 
+{
+	
+	xData = getData();
+	showData(xData);
+	Rxthreshholding(xData);
+	
+>>>>>>> Stashed changes:QuadcopterMain/flight_cointroller/flight_cointroller.ino
     // 1. First, read raw values from MPU-6050
     readSensor();
 
@@ -205,7 +222,8 @@ void loop() {
     // 4. Calculate errors comparing angular motions to set points
     calculateErrors();
 
-    if (isStarted()) {
+    if (isStarted()) 
+    {
         // 5. Calculate motors speed with PID controller
         pidController();
 
@@ -216,13 +234,24 @@ void loop() {
     applyMotorSpeed();
 }
 
+<<<<<<< Updated upstream:QuadcopterMain/flight_cointroller.ino
 void getData() {
     if ( radio.available() ) {
+=======
+//radio functions
+conData getData() 
+{
+    if ( radio.available() ) 
+    {
+>>>>>>> Stashed changes:QuadcopterMain/flight_cointroller/flight_cointroller.ino
         radio.read( &dataReceived, sizeof(dataReceived) );
         newData = true; //dont forget to set to false
     }
+
+    return dataReceived;
 }
 
+<<<<<<< Updated upstream:QuadcopterMain/flight_cointroller.ino
 // void showData() {
 //     if (newData == true) {
 //         Serial.print("Data received ");
@@ -230,6 +259,59 @@ void getData() {
 //         newData = false;
 //     }
 // }
+=======
+//working on this rn
+void Rxthreshholding(conData dataReceived)
+{
+	if(dataReceived.yaw > threshholds.yaw + 3 || dataReceived.yaw < threshholds.yaw - 3){
+		digitalWrite(62, HIGH);
+	}
+	else{
+		digitalWrite(62, LOW);	
+	}
+	
+	if(dataReceived.pitch > threshholds.pitch + 3 || dataReceived.pitch < threshholds.pitch - 3){ // add values to account for noise,unsure of val
+		digitalWrite(63, HIGH);
+	}
+	else{
+		digitalWrite(63, LOW);
+	}
+	
+	if(dataReceived.roll > threshholds.roll + 3 || dataReceived.roll < threshholds.roll - 3){ //add values to account for noise,unsure of val
+		digitalWrite(64, HIGH);
+	}
+	else{
+		digitalWrite(64, LOW);
+	}
+	
+	if(dataReceived.throttle > prev_throttle + 3 || dataReceived.throttle < prev_throttle - 3){
+		digitalWrite(65, HIGH);
+	}
+	else{
+		digitalWrite(65, LOW);	
+	}
+	
+	prev_throttle = dataReceived.throttle;
+	newData = false;
+}
+
+void showData(conData dataReceived) 
+{
+    if (newData == true) {
+        Serial.print("Data received ");
+        Serial.print("\nYaw: " );
+        Serial.print((int)dataReceived.yaw);
+        Serial.print("\nPitch: ");
+        Serial.print((int)dataReceived.pitch);
+        Serial.print("\nRoll: ");
+        Serial.print((int)dataReceived.roll);
+        Serial.print("\nThrottle: ");
+        Serial.print((int)dataReceived.throttle);
+        Serial.print("\n");
+        
+    }
+}
+>>>>>>> Stashed changes:QuadcopterMain/flight_cointroller/flight_cointroller.ino
 
 /**
  * Generate servo-signal on digital pins #4 #5 #6 #7 with a frequency of 250Hz (4ms period).
@@ -272,7 +354,8 @@ void applyMotorSpeed() {
 /**
  * Request raw values from MPU6050.
  */
-void readSensor() {
+void readSensor() 
+{
     Wire.beginTransmission(MPU_ADDRESS); // Start communicating with the MPU-6050
     Wire.write(0x3B);                    // Send the requested starting register
     Wire.endTransmission();              // End the transmission
@@ -554,12 +637,12 @@ float minMax(float value, float min_value, float max_value) {
  */
 bool isStarted() {
     // When left stick is moved in the bottom left corner
-    if (status == STOPPED && pulse_length[mode_mapping[YAW]] <= 1012 && pulse_length[mode_mapping[THROTTLE]] <= 1012) {
+    if (status == STOPPED && dataReceived.yaw <= 0 && dataReceived.throttle <= 255) {
         status = STARTING;
     }
 
     // When left stick is moved back in the center position
-    if (status == STARTING && pulse_length[mode_mapping[YAW]] == 1500 && pulse_length[mode_mapping[THROTTLE]] <= 1012) {
+    if (status == STARTING && dataReceived.yaw == 127 && dataReceived.yaw <= 127) {
         status = STARTED;
 
         // Reset PID controller's variables to prevent bump start
