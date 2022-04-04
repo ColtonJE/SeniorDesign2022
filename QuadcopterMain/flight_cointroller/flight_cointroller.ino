@@ -339,6 +339,7 @@ void Rxthreshholding(){
 		digitalWrite(64, HIGH);
 		delay(12000);
 		digitalWrite(64, LOW);
+	}
 	else{
 		digitalWrite(64, HIGH);
 		delay(1500);
@@ -350,7 +351,7 @@ void Rxthreshholding(){
 		delay(2000);
 		digitalWrite(65, LOW);
 	}
-	if else(dataReceived.throttle < prev_throttle - 3){
+	else if(dataReceived.throttle < prev_throttle - 3){
 		digitalWrite(65, HIGH);
 		delay(12000);
 		digitalWrite(65, LOW);
