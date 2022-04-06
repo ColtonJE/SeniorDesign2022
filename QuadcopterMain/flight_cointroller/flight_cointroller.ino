@@ -22,7 +22,7 @@ typedef struct {
 }conData;
 
 conData threshholds;
-
+conData xData;
 conData dataReceived; // this must match dataToSend in the TX
 bool newData = false;
 
@@ -49,7 +49,7 @@ bool newData = false;
 #define STARTED  2
 
 
-void myRoutine();
+//void myRoutine();
 
 //Rx threshhold values, not sure exactly what they need to be yet
 volatile byte prev_yaw = 127;
@@ -228,9 +228,9 @@ void setup() {
 //dont forget to call getdata and threshhold
 void loop() {
 	
-	getData();
-	showData();
-	Rxthreshholding();
+	xData = getData();
+	showData(xData);
+	Rxthreshholding(xData);
 	
     // 1. First, read raw values from MPU-6050
     readSensor();
@@ -297,7 +297,7 @@ void getData() {
 // 	newData = false;
 // }
 
-void Rxthreshholding(){
+void Rxthreshholding(conData dataReceived){
 	if(dataReceived.yaw > threshholds.yaw + 3){
 // 		digitalWrite(62, HIGH);
 // 		delay(2000);
@@ -378,7 +378,7 @@ void Rxthreshholding(){
 	newData = false;
 }
 
-void showData() {
+void showData(conData dataReceived) {
     if (newData == true) {
         Serial.print("Data received ");
         Serial.print("\nYaw: " );
