@@ -201,10 +201,10 @@ void setup() {
     //PCMSK0 |= (1 << PCINT1); // Set PCINT1 (digital input 9) to trigger an interrupt on state change
     //PCMSK0 |= (1 << PCINT2); // Set PCINT2 (digital input 10)to trigger an interrupt on state change
     //PCMSK0 |= (1 << PCINT3); // Set PCINT3 (digital input 11)to trigger an interrupt on state change
-// attachInterrupt(digitalPinToInterrupt(62), myRoutine, CHANGE);
-// attachInterrupt(digitalPinToInterrupt(63), myRoutine, CHANGE);
-// attachInterrupt(digitalPinToInterrupt(64), myRoutine, CHANGE);
-// attachInterrupt(digitalPinToInterrupt(65), myRoutine, CHANGE);
+attachInterrupt(digitalPinToInterrupt(62), myRoutine, HIGH);
+attachInterrupt(digitalPinToInterrupt(63), myRoutine, HIGH);
+attachInterrupt(digitalPinToInterrupt(64), myRoutine, HIGH);
+attachInterrupt(digitalPinToInterrupt(65), myRoutine, HIGH);
     
 	
     period = (1000000/FREQ) ; // Sampling period in µs
@@ -264,38 +264,38 @@ void getData() {
 }
 
 //old one, worked for angelo
-// void Rxthreshholding(){
-// 	if(dataReceived.yaw > threshholds.yaw + 3 || dataReceived.yaw < threshholds.yaw - 3){
-// 		digitalWrite(62, HIGH);
-// 	}
-// 	else{
-// 		digitalWrite(62, LOW);	
-// 	}
+void Rxthreshholding(){
+	if(dataReceived.yaw > threshholds.yaw + 3 || dataReceived.yaw < threshholds.yaw - 3){
+		digitalWrite(62, HIGH);
+	}
+	else{
+		digitalWrite(62, LOW);	
+	}
 	
-// 	if(dataReceived.pitch > threshholds.pitch + 3 || dataReceived.pitch < threshholds.pitch - 3){ // add values to account for noise,unsure of val
-// 		digitalWrite(63, HIGH);
-// 	}
-// 	else{
-// 		digitalWrite(63, LOW);
-// 	}
+	if(dataReceived.pitch > threshholds.pitch + 3 || dataReceived.pitch < threshholds.pitch - 3){ // add values to account for noise,unsure of val
+		digitalWrite(63, HIGH);
+	}
+	else{
+		digitalWrite(63, LOW);
+	}
 	
-// 	if(dataReceived.roll > threshholds.roll + 3 || dataReceived.roll < threshholds.roll - 3){ //add values to account for noise,unsure of val
-// 		digitalWrite(64, HIGH);
-// 	}
-// 	else{
-// 		digitalWrite(64, LOW);
-// 	}
+	if(dataReceived.roll > threshholds.roll + 3 || dataReceived.roll < threshholds.roll - 3){ //add values to account for noise,unsure of val
+		digitalWrite(64, HIGH);
+	}
+	else{
+		digitalWrite(64, LOW);
+	}
 	
-// 	if(dataReceived.throttle > prev_throttle + 3 || dataReceived.throttle < prev_throttle - 3){
-// 		digitalWrite(65, HIGH);
-// 	}
-// 	else{
-// 		digitalWrite(65, LOW);	
-// 	}
+	if(dataReceived.throttle > prev_throttle + 3 || dataReceived.throttle < prev_throttle - 3){
+		digitalWrite(65, HIGH);
+	}
+	else{
+		digitalWrite(65, LOW);	
+	}
 	
-// 	prev_throttle = dataReceived.throttle;
-// 	newData = false;
-// }
+	prev_throttle = dataReceived.throttle;
+	newData = false;
+}
 
 //different method, not working
 // void Rxthreshholding(conData dataReceived){
@@ -379,14 +379,14 @@ void getData() {
 // 	newData = false;
 // }
 
-void Rxthreshholding(conData dataReceived){
-	pulse_length[CHANNEL1] = map(dataReceived.yaw, 0, 255, 1000, 2000);
-	pulse_length[CHANNEL2] = map(dataReceived.pitch, 0, 255, 1000, 2000);
-	pulse_length[CHANNEL3] = map(dataReceived.roll, 0, 255, 1000, 2000);
-	pulse_length[CHANNEL4] = map(dataReceived.throttle, 0, 255, 1000, 2000);
+// void Rxthreshholding(conData dataReceived){
+// 	pulse_length[CHANNEL1] = map(dataReceived.yaw, 0, 255, 1000, 2000);
+// 	pulse_length[CHANNEL2] = map(dataReceived.pitch, 0, 255, 1000, 2000);
+// 	pulse_length[CHANNEL3] = map(dataReceived.roll, 0, 255, 1000, 2000);
+// 	pulse_length[CHANNEL4] = map(dataReceived.throttle, 0, 255, 1000, 2000);
 
-	newData = false;
-}
+// 	newData = false;
+// }
 void showData(conData dataReceived) {
     if (newData == true) {
         Serial.print("Data received ");
@@ -922,3 +922,25 @@ bool isBatteryConnected() {
 //             pulse_length[CHANNEL4] = current_time - timer[CHANNEL4];   // Calculate pulse duration & save it
 //         }
 // }
+void myRoutine() {
+
+        // Channel 1 -------------------------------------------------
+        if (digitalRead(62)) {    
+		pulse_length[CHANNEL1] = map(dataReceived.yaw, 0, 255, 1000, 2000);
+	}
+
+        // Channel 2 -------------------------------------------------
+        if (digitalRead(63)) {
+		pulse_length[CHANNEL2] = map(dataReceived.pitch, 0, 255, 1000, 2000);
+	}
+
+        // Channel 3 -------------------------------------------------
+        if (digitalRead(64)) {
+		pulse_length[CHANNEL3] = map(dataReceived.roll, 0, 255, 1000, 2000);
+	}
+
+        // Channel 4 -------------------------------------------------
+        if (digitalRead(65)) {
+		pulse_length[CHANNEL4] = map(dataReceived.throttle, 0, 255, 1000, 2000);
+        }
+}
