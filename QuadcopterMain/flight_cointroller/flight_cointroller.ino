@@ -225,17 +225,16 @@ void setup() {
 //dont forget to call getdata and threshhold
 void loop() {
   
-	getData();
+	//getData();
 	//Rxthreshholding();
 
-  if(newData)
-  {
-    pulse_length[CHANNEL1] = map(dataReceived.yaw, 0, 255, 1000, 2000);
-pulse_length[CHANNEL2] = map(dataReceived.pitch, 0, 255, 1000, 2000);
-pulse_length[CHANNEL3] = map(dataReceived.roll, 0, 255, 1000, 2000);
-pulse_length[CHANNEL4] = map(dataReceived.throttle, 0, 255, 1000, 2000);
-newData = false;
-  }
+//  if(newData)
+//  {
+//    pulse_length[CHANNEL1] = map(dataReceived.yaw, 0, 255, 1000, 2000);
+//    pulse_length[CHANNEL2] = map(dataReceived.pitch, 0, 255, 1000, 2000);
+//    pulse_length[CHANNEL3] = map(dataReceived.roll, 0, 255, 1000, 2000);
+//    pulse_length[CHANNEL4] = map(dataReceived.throttle, 0, 255, 1000, 2000);
+//  }
     // 1. First, read raw values from MPU-6050
     readSensor();
 
@@ -248,7 +247,7 @@ newData = false;
     // 4. Calculate errors comparing angular motions to set points
     calculateErrors();
 
-    if (isStarted()) {
+    if (isStarted() || !isStarted()) {
         // 5. Calculate motors speed with PID controller
         pidController();
 
@@ -259,6 +258,8 @@ newData = false;
     applyMotorSpeed();
 
     showData();
+    //newData = false;
+    delay(1000);
 }
 
 //radio functions
@@ -271,102 +272,7 @@ void getData() {
     
 }
 
-//old one, worked for angelo
-//void Rxthreshholding(){
 
-	//newData = false;
-//}
-
-//different method, not working
-// void Rxthreshholding(conData dataReceived){
-// 	if(dataReceived.yaw > threshholds.yaw + 3){
-// // 		digitalWrite(62, HIGH);
-// // 		delay(2000);
-// // 		digitalWrite(62, LOW);
-// 		pulse_length[CHANNEL1] = 2000
-// 	}
-// 	else if(dataReceived.yaw < threshholds.yaw - 3){
-// // 		digitalWrite(62, HIGH);
-// // 		delay(1200);
-// // 		digitalWrite(62, LOW);
-// 		pulse_length[CHANNEL1] = 1200
-// 	}
-// 	else{
-// // 		digitalWrite(62, HIGH);
-// // 		delay(1500);
-// // 		digitalWrite(62, LOW);
-// 		pulse_length[CHANNEL1] = 1500
-// 	}
-	
-// 	if(dataReceived.pitch > threshholds.pitch + 3){ // add values to account for noise,unsure of val
-// // 		digitalWrite(63, HIGH);
-// // 		delay(2000);
-// // 		digitalWrite(63, LOW);
-// 		pulse_length[CHANNEL2] = 2000
-// 	}
-// 	else if(dataReceived.pitch < threshholds.pitch - 3){ // add values to account for noise,unsure of val
-// // 		digitalWrite(63, HIGH);
-// // 		delay(1200);
-// // 		digitalWrite(63,LOW);
-// 		pulse_length[CHANNEL2] = 1200
-// 	}
-// 	else{
-// // 		digitalWrite(63, HIGH);
-// // 		delay(1500);
-// // 		digitalWrite(63,LOW);
-// 		pulse_length[CHANNEL2] = 1500
-// 	}
-	
-// 	if(dataReceived.roll > threshholds.roll + 3){  //add values to account for noise,unsure of val
-// // 		digitalWrite(64, HIGH);
-// // 		delay(2000);
-// // 		digitalWrite(64, LOW);
-// 		pulse_length[CHANNEL3] = 2000
-// 	}
-// 	else if(dataReceived.roll < threshholds.roll - 3){
-// // 		digitalWrite(64, HIGH);
-// // 		delay(12000);
-// // 		digitalWrite(64, LOW);
-// 		pulse_length[CHANNEL3] = 1200
-// 	}
-// 	else{
-// // 		digitalWrite(64, HIGH);
-// // 		delay(1500);
-// // 		digitalWrite(64, LOW);
-// 		pulse_length[CHANNEL3] = 1500
-// 	}
-	
-// 	if(dataReceived.throttle > prev_throttle + 3){
-// // 		digitalWrite(65, HIGH);
-// // 		delay(2000);
-// // 		digitalWrite(65, LOW);
-// 		pulse_length[CHANNEL4] = 2000
-// 	}
-// 	else if(dataReceived.throttle < prev_throttle - 3){
-// // 		digitalWrite(65, HIGH);
-// // 		delay(12000);
-// // 		digitalWrite(65, LOW);
-// 		pulse_length[CHANNEL4] = 1200
-// 	}
-// 	else{
-// // 		digitalWrite(65, HIGH);
-// // 		delay(1500);
-// // 		digitalWrite(65, LOW);
-// 		pulse_length[CHANNEL4] = 1500
-// 	}
-	
-// 	prev_throttle = dataReceived.throttle;
-// 	newData = false;
-// }
-
-// void Rxthreshholding(conData dataReceived){
-// 	pulse_length[CHANNEL1] = map(dataReceived.yaw, 0, 255, 1000, 2000);
-// 	pulse_length[CHANNEL2] = map(dataReceived.pitch, 0, 255, 1000, 2000);
-// 	pulse_length[CHANNEL3] = map(dataReceived.roll, 0, 255, 1000, 2000);
-// 	pulse_length[CHANNEL4] = map(dataReceived.throttle, 0, 255, 1000, 2000);
-
-// 	newData = false;
-// }
 void showData() {
         Serial.println("\n+--------------------------------------------+");
         Serial.print("Data received ");
@@ -385,12 +291,16 @@ void showData() {
      Serial.println((int)pulse_length[CHANNEL3]);
      Serial.println((int)pulse_length[CHANNEL4]);
 
+     Serial.println("Raw gyro values:");
+     Serial.println(gyro_raw[X]);
+     Serial.println(gyro_raw[Y]);
+     Serial.println(gyro_raw[Z]);
+
+
      Serial.print("Started: ");
      Serial.print(isStarted());
-     Serial.println("\n+--------------------------------------------+\n");
-
-     delay(1000);
-       
+     Serial.println("\n+--------------------------------------------+\n");  
+      
 }
 
 /**
@@ -850,92 +760,3 @@ bool isBatteryConnected() {
 
     return battery_voltage < 1240 && battery_voltage > 800;
 }
-
-
-//old ISR
-/**
- * This Interrupt Sub Routine is called each time input 8, 9, 10 or 11 changed state.
- * Read the receiver signals in order to get flight instructions.
- *
- * This routine must be as fast as possible to prevent main program to be messed up.
- * The trick here is to use port registers to read pin state.
- * Doing (PINB & B00000001) is the same as digitalRead(8) with the advantage of using less CPU loops.
- * It is less convenient but more efficient, which is the most important here.
- *
- * @see https://www.arduino.cc/en/Reference/PortManipulation
- * @see https://www.firediy.fr/article/utiliser-sa-radiocommande-avec-un-arduino-drone-ch-6
- */
-// void myRoutine() {
-//         current_time = micros();
-
-//         // Channel 1 -------------------------------------------------
-//         if (digitalRead(62)) {                                        // pin 62 high ?
-//             if (previous_state[CHANNEL1] == LOW) {                     //  changed from 0 to 1 (rising edge)
-//                 previous_state[CHANNEL1] = HIGH;                       // Save current state
-//                 timer[CHANNEL1] = current_time;                        // Save current time
-//             }
-//         } else if (previous_state[CHANNEL1] == HIGH) {                 //  changed from 1 to 0 (falling edge)
-//             previous_state[CHANNEL1] = LOW;                            // Save current state
-//             pulse_length[CHANNEL1] = current_time - timer[CHANNEL1];   // Calculate pulse duration & save it
-//         }
-
-//         // Channel 2 -------------------------------------------------
-//         if (digitalRead(63)) {                                        // pin 63 high ?
-//             if (previous_state[CHANNEL2] == LOW) {                     //  changed from 0 to 1 (rising edge)
-//                 previous_state[CHANNEL2] = HIGH;                       // Save current state
-//                 timer[CHANNEL2] = current_time;                        // Save current time
-//             }
-//         } else if (previous_state[CHANNEL2] == HIGH) {                 //  changed from 1 to 0 (falling edge)
-//             previous_state[CHANNEL2] = LOW;                            // Save current state
-//             pulse_length[CHANNEL2] = current_time - timer[CHANNEL2];   // Calculate pulse duration & save it
-//         }
-
-//         // Channel 3 -------------------------------------------------
-//         if (digitalRead(64)) {                                        // pin 64 high ?
-//             if (previous_state[CHANNEL3] == LOW) {                     //  changed from 0 to 1 (rising edge)
-//                 previous_state[CHANNEL3] = HIGH;                       // Save current state
-//                 timer[CHANNEL3] = current_time;                        // Save current time
-//             }
-//         } else if (previous_state[CHANNEL3] == HIGH) {                 //  changed from 1 to 0 (falling edge)
-//             previous_state[CHANNEL3] = LOW;                            // Save current state
-//             pulse_length[CHANNEL3] = current_time - timer[CHANNEL3];   // Calculate pulse duration & save it
-//         }
-
-//         // Channel 4 -------------------------------------------------
-//         if (digitalRead(65)) {                                        // pin 65 high ?
-//             if (previous_state[CHANNEL4] == LOW) {                     //  changed from 0 to 1 (rising edge)
-//                 previous_state[CHANNEL4] = HIGH;                       // Save current state
-//                 timer[CHANNEL4] = current_time;                        // Save current time
-//             }
-//         } else if (previous_state[CHANNEL4] == HIGH) {                 //  changed from 1 to 0 (falling edge)
-//             previous_state[CHANNEL4] = LOW;                            // Save current state
-//             pulse_length[CHANNEL4] = current_time - timer[CHANNEL4];   // Calculate pulse duration & save it
-//         }
-// }
-//void myRoutine() {
-//
-////        // Channel 1 -------------------------------------------------
-////        if (digitalRead(62)) {    
-////		pulse_length[CHANNEL1] = map((volatile unsigned int)dataReceived.yaw, 0, 255, 1000, 2000);
-////	}
-////
-////        // Channel 2 -------------------------------------------------
-////        if (digitalRead(63)) {
-////		pulse_length[CHANNEL2] = map((volatile unsigned int)dataReceived.pitch, 0, 255, 1000, 2000);
-////	}
-////
-////        // Channel 3 -------------------------------------------------
-////        if (digitalRead(64)) {
-////		pulse_length[CHANNEL3] = map((volatile unsigned int)dataReceived.roll, 0, 255, 1000, 2000);
-////	}
-////
-////        // Channel 4 -------------------------------------------------
-////        if (digitalRead(65)) {
-////		pulse_length[CHANNEL4] = map((volatile unsigned int)dataReceived.throttle, 0, 255, 1000, 2000);
-////        }
-//
-//pulse_length[CHANNEL1] = map(dataReceived.yaw, 0, 255, 1000, 2000);
-//pulse_length[CHANNEL2] = map(dataReceived.pitch, 0, 255, 1000, 2000);
-//pulse_length[CHANNEL3] = map(dataReceived.roll, 0, 255, 1000, 2000);
-//pulse_length[CHANNEL4] = map(dataReceived.throttle, 0, 255, 1000, 2000);
-//}
