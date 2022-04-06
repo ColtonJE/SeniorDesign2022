@@ -3,7 +3,7 @@
 
 //Rx libraries
 #include <SPI.h>
-#include <nRF24L01.h>
+//#include <nRF24L01.h>
 #include <RF24.h>
 
 #define CE_PIN   9
@@ -15,13 +15,18 @@ RF24 radio(CE_PIN, CSN_PIN);
 
 //struct for rx
 typedef struct {
-  byte yaw;
-  byte pitch;
-  byte roll;
-  byte throttle;
+  volatile byte yaw;
+  volatile byte pitch;
+  volatile byte roll;
+  volatile byte throttle;
 }conData;
 
+<<<<<<< Updated upstream:QuadcopterMain/flight_cointroller.ino
 conData dataReceived; // this must match dataToSend in the TX
+=======
+conData threshholds = {127,127,127,0};
+conData dataReceived = {0,0,0,0}; // this must match dataToSend in the TX
+>>>>>>> Stashed changes:QuadcopterMain/flight_cointroller/flight_cointroller.ino
 bool newData = false;
 
 // ------------------- Define some constants for convenience -----------------
@@ -186,6 +191,11 @@ void setup() {
 
     // Turn LED off now setup is done
     digitalWrite(13, LOW);
+<<<<<<< Updated upstream:QuadcopterMain/flight_cointroller.ino
+=======
+	
+	
+>>>>>>> Stashed changes:QuadcopterMain/flight_cointroller/flight_cointroller.ino
 }
 
 
@@ -193,6 +203,14 @@ void setup() {
  * Main program loop
  */
 void loop() {
+<<<<<<< Updated upstream:QuadcopterMain/flight_cointroller.ino
+=======
+  
+	getData();
+	showData();
+	Rxthreshholding();
+	
+>>>>>>> Stashed changes:QuadcopterMain/flight_cointroller/flight_cointroller.ino
     // 1. First, read raw values from MPU-6050
     readSensor();
 
@@ -216,11 +234,55 @@ void loop() {
     applyMotorSpeed();
 }
 
+<<<<<<< Updated upstream:QuadcopterMain/flight_cointroller.ino
 void getData() {
+=======
+//radio functions
+void getData() {
+
+>>>>>>> Stashed changes:QuadcopterMain/flight_cointroller/flight_cointroller.ino
     if ( radio.available() ) {
         radio.read( &dataReceived, sizeof(dataReceived) );
         newData = true; //dont forget to set to false
     }
+<<<<<<< Updated upstream:QuadcopterMain/flight_cointroller.ino
+=======
+    
+}
+
+//old one, worked for angelo
+void Rxthreshholding(){
+	if(dataReceived.yaw > threshholds.yaw + 3 || dataReceived.yaw < threshholds.yaw - 3){
+		digitalWrite(62, HIGH);
+	}
+	else{
+		digitalWrite(62, LOW);	
+	}
+	
+	if(dataReceived.pitch > threshholds.pitch + 3 || dataReceived.pitch < threshholds.pitch - 3){ // add values to account for noise,unsure of val
+		digitalWrite(63, HIGH);
+	}
+	else{
+		digitalWrite(63, LOW);
+	}
+	
+	if(dataReceived.roll > threshholds.roll + 3 || dataReceived.roll < threshholds.roll - 3){ //add values to account for noise,unsure of val
+		digitalWrite(64, HIGH);
+	}
+	else{
+		digitalWrite(64, LOW);
+	}
+	
+	if(dataReceived.throttle > prev_throttle + 3 || dataReceived.throttle < prev_throttle - 3){
+		digitalWrite(65, HIGH);
+	}
+	else{
+		digitalWrite(65, LOW);	
+	}
+	
+	prev_throttle = dataReceived.throttle;
+	newData = false;
+>>>>>>> Stashed changes:QuadcopterMain/flight_cointroller/flight_cointroller.ino
 }
 
 // void showData() {
@@ -231,6 +293,39 @@ void getData() {
 //     }
 // }
 
+<<<<<<< Updated upstream:QuadcopterMain/flight_cointroller.ino
+=======
+// void Rxthreshholding(conData dataReceived){
+// 	pulse_length[CHANNEL1] = map(dataReceived.yaw, 0, 255, 1000, 2000);
+// 	pulse_length[CHANNEL2] = map(dataReceived.pitch, 0, 255, 1000, 2000);
+// 	pulse_length[CHANNEL3] = map(dataReceived.roll, 0, 255, 1000, 2000);
+// 	pulse_length[CHANNEL4] = map(dataReceived.throttle, 0, 255, 1000, 2000);
+
+// 	newData = false;
+// }
+void showData() {
+    if (newData == true) {
+        Serial.print("Data received ");
+        Serial.print("\nYaw: " );
+        Serial.print((int)dataReceived.yaw);
+        Serial.print("\nPitch: ");
+        Serial.print((int)dataReceived.pitch);
+        Serial.print("\nRoll: ");
+        Serial.print((int)dataReceived.roll);
+        Serial.print("\nThrottle: ");
+        Serial.print((int)dataReceived.throttle);
+        Serial.print("\n");
+
+        Serial.println((int)pulse_length[CHANNEL1]);
+        Serial.println((int)pulse_length[CHANNEL2]);
+        Serial.println((int)pulse_length[CHANNEL3]);
+        Serial.println((int)pulse_length[CHANNEL4]);
+        delay(3000);
+        
+    }
+}
+
+>>>>>>> Stashed changes:QuadcopterMain/flight_cointroller/flight_cointroller.ino
 /**
  * Generate servo-signal on digital pins #4 #5 #6 #7 with a frequency of 250Hz (4ms period).
  * Direct port manipulation is used for performances.
@@ -750,3 +845,28 @@ bool isBatteryConnected() {
 //             pulse_length[CHANNEL4] = current_time - timer[CHANNEL4];   // Calculate pulse duration & save it
 //         }
 // }
+<<<<<<< Updated upstream:QuadcopterMain/flight_cointroller.ino
+=======
+void myRoutine() {
+
+        // Channel 1 -------------------------------------------------
+        if (digitalRead(62)) {    
+		pulse_length[CHANNEL1] = map((volatile unsigned int)dataReceived.yaw, 0, 255, 1000, 2000);
+	}
+
+        // Channel 2 -------------------------------------------------
+        if (digitalRead(63)) {
+		pulse_length[CHANNEL2] = map((volatile unsigned int)dataReceived.pitch, 0, 255, 1000, 2000);
+	}
+
+        // Channel 3 -------------------------------------------------
+        if (digitalRead(64)) {
+		pulse_length[CHANNEL3] = map((volatile unsigned int)dataReceived.roll, 0, 255, 1000, 2000);
+	}
+
+        // Channel 4 -------------------------------------------------
+        if (digitalRead(65)) {
+		pulse_length[CHANNEL4] = map((volatile unsigned int)dataReceived.throttle, 0, 255, 1000, 2000);
+        }
+}
+>>>>>>> Stashed changes:QuadcopterMain/flight_cointroller/flight_cointroller.ino
