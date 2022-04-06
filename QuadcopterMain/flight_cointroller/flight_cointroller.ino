@@ -226,7 +226,6 @@ void setup() {
 void loop() {
   
 	getData();
-	showData();
 	//Rxthreshholding();
 
   if(newData)
@@ -258,6 +257,8 @@ newData = false;
 
     // 6. Apply motors speed
     applyMotorSpeed();
+
+    showData();
 }
 
 //radio functions
@@ -367,8 +368,8 @@ void getData() {
 // 	newData = false;
 // }
 void showData() {
-    if (newData == true) {
-        Serial.print("\nData received ");
+        Serial.println("\n+--------------------------------------------+");
+        Serial.print("Data received ");
         Serial.print("\nYaw: " );
         Serial.print((int)dataReceived.yaw);
         Serial.print("\nPitch: ");
@@ -380,15 +381,16 @@ void showData() {
         Serial.print("\n");
 
         Serial.println((int)pulse_length[CHANNEL1]);
-        Serial.println((int)pulse_length[CHANNEL2]);
-        Serial.println((int)pulse_length[CHANNEL3]);
-        Serial.println((int)pulse_length[CHANNEL4]);
+     Serial.println((int)pulse_length[CHANNEL2]);
+     Serial.println((int)pulse_length[CHANNEL3]);
+     Serial.println((int)pulse_length[CHANNEL4]);
 
-        Serial.print("Started: ");
-        Serial.print(isStarted());
-        delay(3000);
-        
-    }
+     Serial.print("Started: ");
+     Serial.print(isStarted());
+     Serial.println("\n+--------------------------------------------+\n");
+
+     delay(1000);
+       
 }
 
 /**
@@ -719,7 +721,7 @@ bool isStarted() {
     }
 
     // When left stick is moved back in the center position
-    if (status == STARTING && pulse_length[mode_mapping[YAW]] == 1500 && pulse_length[mode_mapping[THROTTLE]] <= 1012) {
+    if (status == STARTING && pulse_length[mode_mapping[YAW]] >= 1480 && pulse_length[mode_mapping[YAW]] <= 1520 && pulse_length[mode_mapping[THROTTLE]] <= 1012) {
         status = STARTED;
 
         // Reset PID controller's variables to prevent bump start
