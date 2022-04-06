@@ -201,10 +201,10 @@ void setup() {
     //PCMSK0 |= (1 << PCINT1); // Set PCINT1 (digital input 9) to trigger an interrupt on state change
     //PCMSK0 |= (1 << PCINT2); // Set PCINT2 (digital input 10)to trigger an interrupt on state change
     //PCMSK0 |= (1 << PCINT3); // Set PCINT3 (digital input 11)to trigger an interrupt on state change
-attachInterrupt(digitalPinToInterrupt(62), myRoutine, CHANGE);
-attachInterrupt(digitalPinToInterrupt(63), myRoutine, CHANGE);
-attachInterrupt(digitalPinToInterrupt(64), myRoutine, CHANGE);
-attachInterrupt(digitalPinToInterrupt(65), myRoutine, CHANGE);
+// attachInterrupt(digitalPinToInterrupt(62), myRoutine, CHANGE);
+// attachInterrupt(digitalPinToInterrupt(63), myRoutine, CHANGE);
+// attachInterrupt(digitalPinToInterrupt(64), myRoutine, CHANGE);
+// attachInterrupt(digitalPinToInterrupt(65), myRoutine, CHANGE);
     
 	
     period = (1000000/FREQ) ; // Sampling period in µs
@@ -299,67 +299,79 @@ void getData() {
 
 void Rxthreshholding(){
 	if(dataReceived.yaw > threshholds.yaw + 3){
-		digitalWrite(62, HIGH);
-		delay(2000);
-		digitalWrite(62, LOW);
+// 		digitalWrite(62, HIGH);
+// 		delay(2000);
+// 		digitalWrite(62, LOW);
+		pulse_length[CHANNEL1] = 2000
 	}
 	else if(dataReceived.yaw < threshholds.yaw - 3){
-		digitalWrite(62, HIGH);
-		delay(1200);
-		digitalWrite(62, LOW);
+// 		digitalWrite(62, HIGH);
+// 		delay(1200);
+// 		digitalWrite(62, LOW);
+		pulse_length[CHANNEL1] = 1200
 	}
 	else{
-		digitalWrite(62, HIGH);
-		delay(1500);
-		digitalWrite(62, LOW);	
+// 		digitalWrite(62, HIGH);
+// 		delay(1500);
+// 		digitalWrite(62, LOW);
+		pulse_length[CHANNEL1] = 1500
 	}
 	
 	if(dataReceived.pitch > threshholds.pitch + 3){ // add values to account for noise,unsure of val
-		digitalWrite(63, HIGH);
-		delay(2000);
-		digitalWrite(63, LOW);
+// 		digitalWrite(63, HIGH);
+// 		delay(2000);
+// 		digitalWrite(63, LOW);
+		pulse_length[CHANNEL2] = 2000
 	}
-	if(dataReceived.pitch < threshholds.pitch - 3){ // add values to account for noise,unsure of val
-		digitalWrite(63, HIGH);
-		delay(1200);
-		digitalWrite(63,LOW);
+	else if(dataReceived.pitch < threshholds.pitch - 3){ // add values to account for noise,unsure of val
+// 		digitalWrite(63, HIGH);
+// 		delay(1200);
+// 		digitalWrite(63,LOW);
+		pulse_length[CHANNEL2] = 1200
 	}
 	else{
-		digitalWrite(63, HIGH);
-		delay(1500);
-		digitalWrite(63,LOW);
+// 		digitalWrite(63, HIGH);
+// 		delay(1500);
+// 		digitalWrite(63,LOW);
+		pulse_length[CHANNEL2] = 1500
 	}
 	
 	if(dataReceived.roll > threshholds.roll + 3){  //add values to account for noise,unsure of val
-		digitalWrite(64, HIGH);
-		delay(2000);
-		digitalWrite(64, LOW);
+// 		digitalWrite(64, HIGH);
+// 		delay(2000);
+// 		digitalWrite(64, LOW);
+		pulse_length[CHANNEL3] = 2000
 	}
 	else if(dataReceived.roll < threshholds.roll - 3){
-		digitalWrite(64, HIGH);
-		delay(12000);
-		digitalWrite(64, LOW);
+// 		digitalWrite(64, HIGH);
+// 		delay(12000);
+// 		digitalWrite(64, LOW);
+		pulse_length[CHANNEL3] = 1200
 	}
 	else{
-		digitalWrite(64, HIGH);
-		delay(1500);
-		digitalWrite(64, LOW);
+// 		digitalWrite(64, HIGH);
+// 		delay(1500);
+// 		digitalWrite(64, LOW);
+		pulse_length[CHANNEL3] = 1500
 	}
 	
 	if(dataReceived.throttle > prev_throttle + 3){
-		digitalWrite(65, HIGH);
-		delay(2000);
-		digitalWrite(65, LOW);
+// 		digitalWrite(65, HIGH);
+// 		delay(2000);
+// 		digitalWrite(65, LOW);
+		pulse_length[CHANNEL4] = 2000
 	}
 	else if(dataReceived.throttle < prev_throttle - 3){
-		digitalWrite(65, HIGH);
-		delay(12000);
-		digitalWrite(65, LOW);
+// 		digitalWrite(65, HIGH);
+// 		delay(12000);
+// 		digitalWrite(65, LOW);
+		pulse_length[CHANNEL4] = 1200
 	}
 	else{
-		digitalWrite(65, HIGH);
-		delay(1500);
-		digitalWrite(65, LOW);
+// 		digitalWrite(65, HIGH);
+// 		delay(1500);
+// 		digitalWrite(65, LOW);
+		pulse_length[CHANNEL4] = 1500
 	}
 	
 	prev_throttle = dataReceived.throttle;
@@ -854,50 +866,50 @@ bool isBatteryConnected() {
  * @see https://www.arduino.cc/en/Reference/PortManipulation
  * @see https://www.firediy.fr/article/utiliser-sa-radiocommande-avec-un-arduino-drone-ch-6
  */
-void myRoutine() {
-        current_time = micros();
+// void myRoutine() {
+//         current_time = micros();
 
-        // Channel 1 -------------------------------------------------
-        if (digitalRead(62)) {                                        // pin 62 high ?
-            if (previous_state[CHANNEL1] == LOW) {                     //  changed from 0 to 1 (rising edge)
-                previous_state[CHANNEL1] = HIGH;                       // Save current state
-                timer[CHANNEL1] = current_time;                        // Save current time
-            }
-        } else if (previous_state[CHANNEL1] == HIGH) {                 //  changed from 1 to 0 (falling edge)
-            previous_state[CHANNEL1] = LOW;                            // Save current state
-            pulse_length[CHANNEL1] = current_time - timer[CHANNEL1];   // Calculate pulse duration & save it
-        }
+//         // Channel 1 -------------------------------------------------
+//         if (digitalRead(62)) {                                        // pin 62 high ?
+//             if (previous_state[CHANNEL1] == LOW) {                     //  changed from 0 to 1 (rising edge)
+//                 previous_state[CHANNEL1] = HIGH;                       // Save current state
+//                 timer[CHANNEL1] = current_time;                        // Save current time
+//             }
+//         } else if (previous_state[CHANNEL1] == HIGH) {                 //  changed from 1 to 0 (falling edge)
+//             previous_state[CHANNEL1] = LOW;                            // Save current state
+//             pulse_length[CHANNEL1] = current_time - timer[CHANNEL1];   // Calculate pulse duration & save it
+//         }
 
-        // Channel 2 -------------------------------------------------
-        if (digitalRead(63)) {                                        // pin 63 high ?
-            if (previous_state[CHANNEL2] == LOW) {                     //  changed from 0 to 1 (rising edge)
-                previous_state[CHANNEL2] = HIGH;                       // Save current state
-                timer[CHANNEL2] = current_time;                        // Save current time
-            }
-        } else if (previous_state[CHANNEL2] == HIGH) {                 //  changed from 1 to 0 (falling edge)
-            previous_state[CHANNEL2] = LOW;                            // Save current state
-            pulse_length[CHANNEL2] = current_time - timer[CHANNEL2];   // Calculate pulse duration & save it
-        }
+//         // Channel 2 -------------------------------------------------
+//         if (digitalRead(63)) {                                        // pin 63 high ?
+//             if (previous_state[CHANNEL2] == LOW) {                     //  changed from 0 to 1 (rising edge)
+//                 previous_state[CHANNEL2] = HIGH;                       // Save current state
+//                 timer[CHANNEL2] = current_time;                        // Save current time
+//             }
+//         } else if (previous_state[CHANNEL2] == HIGH) {                 //  changed from 1 to 0 (falling edge)
+//             previous_state[CHANNEL2] = LOW;                            // Save current state
+//             pulse_length[CHANNEL2] = current_time - timer[CHANNEL2];   // Calculate pulse duration & save it
+//         }
 
-        // Channel 3 -------------------------------------------------
-        if (digitalRead(64)) {                                        // pin 64 high ?
-            if (previous_state[CHANNEL3] == LOW) {                     //  changed from 0 to 1 (rising edge)
-                previous_state[CHANNEL3] = HIGH;                       // Save current state
-                timer[CHANNEL3] = current_time;                        // Save current time
-            }
-        } else if (previous_state[CHANNEL3] == HIGH) {                 //  changed from 1 to 0 (falling edge)
-            previous_state[CHANNEL3] = LOW;                            // Save current state
-            pulse_length[CHANNEL3] = current_time - timer[CHANNEL3];   // Calculate pulse duration & save it
-        }
+//         // Channel 3 -------------------------------------------------
+//         if (digitalRead(64)) {                                        // pin 64 high ?
+//             if (previous_state[CHANNEL3] == LOW) {                     //  changed from 0 to 1 (rising edge)
+//                 previous_state[CHANNEL3] = HIGH;                       // Save current state
+//                 timer[CHANNEL3] = current_time;                        // Save current time
+//             }
+//         } else if (previous_state[CHANNEL3] == HIGH) {                 //  changed from 1 to 0 (falling edge)
+//             previous_state[CHANNEL3] = LOW;                            // Save current state
+//             pulse_length[CHANNEL3] = current_time - timer[CHANNEL3];   // Calculate pulse duration & save it
+//         }
 
-        // Channel 4 -------------------------------------------------
-        if (digitalRead(65)) {                                        // pin 65 high ?
-            if (previous_state[CHANNEL4] == LOW) {                     //  changed from 0 to 1 (rising edge)
-                previous_state[CHANNEL4] = HIGH;                       // Save current state
-                timer[CHANNEL4] = current_time;                        // Save current time
-            }
-        } else if (previous_state[CHANNEL4] == HIGH) {                 //  changed from 1 to 0 (falling edge)
-            previous_state[CHANNEL4] = LOW;                            // Save current state
-            pulse_length[CHANNEL4] = current_time - timer[CHANNEL4];   // Calculate pulse duration & save it
-        }
-}
+//         // Channel 4 -------------------------------------------------
+//         if (digitalRead(65)) {                                        // pin 65 high ?
+//             if (previous_state[CHANNEL4] == LOW) {                     //  changed from 0 to 1 (rising edge)
+//                 previous_state[CHANNEL4] = HIGH;                       // Save current state
+//                 timer[CHANNEL4] = current_time;                        // Save current time
+//             }
+//         } else if (previous_state[CHANNEL4] == HIGH) {                 //  changed from 1 to 0 (falling edge)
+//             previous_state[CHANNEL4] = LOW;                            // Save current state
+//             pulse_length[CHANNEL4] = current_time - timer[CHANNEL4];   // Calculate pulse duration & save it
+//         }
+// }
