@@ -3,7 +3,7 @@
 
 //Rx libraries
 #include <SPI.h>
-#include <nRF24L01.h>
+//#include <nRF24L01.h>
 #include <RF24.h>
 
 #define CE_PIN   25
@@ -15,15 +15,14 @@ RF24 radio(CE_PIN, CSN_PIN);
 
 //struct for rx
 typedef struct {
-  byte yaw;
-  byte pitch;
-  byte roll;
-  byte throttle;
+  volatile byte yaw;
+  volatile byte pitch;
+  volatile byte roll;
+  volatile byte throttle;
 }conData;
 
-conData threshholds;
-conData xData;
-conData dataReceived; // this must match dataToSend in the TX
+conData threshholds = {127,127,127,0};
+conData dataReceived = {0,0,0,0}; // this must match dataToSend in the TX
 bool newData = false;
 
 // ------------------- Define some constants for convenience -----------------
@@ -201,10 +200,11 @@ void setup() {
     //PCMSK0 |= (1 << PCINT1); // Set PCINT1 (digital input 9) to trigger an interrupt on state change
     //PCMSK0 |= (1 << PCINT2); // Set PCINT2 (digital input 10)to trigger an interrupt on state change
     //PCMSK0 |= (1 << PCINT3); // Set PCINT3 (digital input 11)to trigger an interrupt on state change
-attachInterrupt(digitalPinToInterrupt(62), myRoutine, HIGH);
-attachInterrupt(digitalPinToInterrupt(63), myRoutine, HIGH);
-attachInterrupt(digitalPinToInterrupt(64), myRoutine, HIGH);
-attachInterrupt(digitalPinToInterrupt(65), myRoutine, HIGH);
+//attachInterrupt(digitalPinToInterrupt(62), myRoutine, HIGH);
+//attachInterrupt(digitalPinToInterrupt(63), myRoutine, HIGH);
+//attachInterrupt(digitalPinToInterrupt(64), myRoutine, HIGH);
+//attachInterrupt(digitalPinToInterrupt(65), myRoutine, HIGH);
+//attachInterrupt(digitalPinToInterrupt(),myRoutine, HIGH);
     
 	
     period = (1000000/FREQ) ; // Sampling period in µs
@@ -215,10 +215,7 @@ attachInterrupt(digitalPinToInterrupt(65), myRoutine, HIGH);
     // Turn LED off now setup is done
     digitalWrite(13, LOW);
 	
-	threshholds.yaw = 127;
-	threshholds.pitch = 127;
-	threshholds.roll = 127;
-	threshholds.throttle = 0;
+	
 }
 
 
@@ -227,11 +224,19 @@ attachInterrupt(digitalPinToInterrupt(65), myRoutine, HIGH);
  */
 //dont forget to call getdata and threshhold
 void loop() {
-	
-	xData = getData();
-	showData(xData);
-	Rxthreshholding(xData);
-	
+  
+	getData();
+	showData();
+	//Rxthreshholding();
+
+  if(newData)
+  {
+    pulse_length[CHANNEL1] = map(dataReceived.yaw, 0, 255, 1000, 2000);
+pulse_length[CHANNEL2] = map(dataReceived.pitch, 0, 255, 1000, 2000);
+pulse_length[CHANNEL3] = map(dataReceived.roll, 0, 255, 1000, 2000);
+pulse_length[CHANNEL4] = map(dataReceived.throttle, 0, 255, 1000, 2000);
+newData = false;
+  }
     // 1. First, read raw values from MPU-6050
     readSensor();
 
@@ -256,47 +261,20 @@ void loop() {
 }
 
 //radio functions
-conData getData() {
+void getData() {
+
     if ( radio.available() ) {
         radio.read( &dataReceived, sizeof(dataReceived) );
         newData = true;
     }
-    return dataReceived;
+    
 }
 
 //old one, worked for angelo
-void Rxthreshholding(conData x){
-	if(x.yaw > threshholds.yaw + 3 || x.yaw < threshholds.yaw - 3){
-		digitalWrite(62, HIGH);
-	}
-	else{
-		digitalWrite(62, LOW);	
-	}
-	
-	if(x.pitch > threshholds.pitch + 3 || x.pitch < threshholds.pitch - 3){ // add values to account for noise,unsure of val
-		digitalWrite(63, HIGH);
-	}
-	else{
-		digitalWrite(63, LOW);
-	}
-	
-	if(x.roll > threshholds.roll + 3 || x.roll < threshholds.roll - 3){ //add values to account for noise,unsure of val
-		digitalWrite(64, HIGH);
-	}
-	else{
-		digitalWrite(64, LOW);
-	}
-	
-	if(x.throttle > prev_throttle + 3 || x.throttle < prev_throttle - 3){
-		digitalWrite(65, HIGH);
-	}
-	else{
-		digitalWrite(65, LOW);	
-	}
-	
-	prev_throttle = x.throttle;
-	newData = false;
-}
+//void Rxthreshholding(){
+
+	//newData = false;
+//}
 
 //different method, not working
 // void Rxthreshholding(conData dataReceived){
@@ -388,18 +366,27 @@ void Rxthreshholding(conData x){
 
 // 	newData = false;
 // }
-void showData(conData x) {
+void showData() {
     if (newData == true) {
-        Serial.print("Data received ");
+        Serial.print("\nData received ");
         Serial.print("\nYaw: " );
-        Serial.print((int)x.yaw);
+        Serial.print((int)dataReceived.yaw);
         Serial.print("\nPitch: ");
-        Serial.print((int)x.pitch);
+        Serial.print((int)dataReceived.pitch);
         Serial.print("\nRoll: ");
-        Serial.print((int)x.roll);
+        Serial.print((int)dataReceived.roll);
         Serial.print("\nThrottle: ");
-        Serial.print((int)x.throttle);
+        Serial.print((int)dataReceived.throttle);
         Serial.print("\n");
+
+        Serial.println((int)pulse_length[CHANNEL1]);
+        Serial.println((int)pulse_length[CHANNEL2]);
+        Serial.println((int)pulse_length[CHANNEL3]);
+        Serial.println((int)pulse_length[CHANNEL4]);
+
+        Serial.print("Started: ");
+        Serial.print(isStarted());
+        delay(3000);
         
     }
 }
@@ -923,25 +910,30 @@ bool isBatteryConnected() {
 //             pulse_length[CHANNEL4] = current_time - timer[CHANNEL4];   // Calculate pulse duration & save it
 //         }
 // }
-void myRoutine() {
-
-        // Channel 1 -------------------------------------------------
-        if (digitalRead(62)) {    
-		pulse_length[CHANNEL1] = map(dataReceived.yaw, 0, 255, 1000, 2000);
-	}
-
-        // Channel 2 -------------------------------------------------
-        if (digitalRead(63)) {
-		pulse_length[CHANNEL2] = map(dataReceived.pitch, 0, 255, 1000, 2000);
-	}
-
-        // Channel 3 -------------------------------------------------
-        if (digitalRead(64)) {
-		pulse_length[CHANNEL3] = map(dataReceived.roll, 0, 255, 1000, 2000);
-	}
-
-        // Channel 4 -------------------------------------------------
-        if (digitalRead(65)) {
-		pulse_length[CHANNEL4] = map(dataReceived.throttle, 0, 255, 1000, 2000);
-        }
-}
+//void myRoutine() {
+//
+////        // Channel 1 -------------------------------------------------
+////        if (digitalRead(62)) {    
+////		pulse_length[CHANNEL1] = map((volatile unsigned int)dataReceived.yaw, 0, 255, 1000, 2000);
+////	}
+////
+////        // Channel 2 -------------------------------------------------
+////        if (digitalRead(63)) {
+////		pulse_length[CHANNEL2] = map((volatile unsigned int)dataReceived.pitch, 0, 255, 1000, 2000);
+////	}
+////
+////        // Channel 3 -------------------------------------------------
+////        if (digitalRead(64)) {
+////		pulse_length[CHANNEL3] = map((volatile unsigned int)dataReceived.roll, 0, 255, 1000, 2000);
+////	}
+////
+////        // Channel 4 -------------------------------------------------
+////        if (digitalRead(65)) {
+////		pulse_length[CHANNEL4] = map((volatile unsigned int)dataReceived.throttle, 0, 255, 1000, 2000);
+////        }
+//
+//pulse_length[CHANNEL1] = map(dataReceived.yaw, 0, 255, 1000, 2000);
+//pulse_length[CHANNEL2] = map(dataReceived.pitch, 0, 255, 1000, 2000);
+//pulse_length[CHANNEL3] = map(dataReceived.roll, 0, 255, 1000, 2000);
+//pulse_length[CHANNEL4] = map(dataReceived.throttle, 0, 255, 1000, 2000);
+//}
