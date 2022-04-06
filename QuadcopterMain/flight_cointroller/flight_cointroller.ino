@@ -263,7 +263,7 @@ void getData() {
     }
 }
 
-//old one for reference
+//old one, worked for angelo
 // void Rxthreshholding(){
 // 	if(dataReceived.yaw > threshholds.yaw + 3 || dataReceived.yaw < threshholds.yaw - 3){
 // 		digitalWrite(62, HIGH);
@@ -297,87 +297,96 @@ void getData() {
 // 	newData = false;
 // }
 
+//different method, not working
+// void Rxthreshholding(conData dataReceived){
+// 	if(dataReceived.yaw > threshholds.yaw + 3){
+// // 		digitalWrite(62, HIGH);
+// // 		delay(2000);
+// // 		digitalWrite(62, LOW);
+// 		pulse_length[CHANNEL1] = 2000
+// 	}
+// 	else if(dataReceived.yaw < threshholds.yaw - 3){
+// // 		digitalWrite(62, HIGH);
+// // 		delay(1200);
+// // 		digitalWrite(62, LOW);
+// 		pulse_length[CHANNEL1] = 1200
+// 	}
+// 	else{
+// // 		digitalWrite(62, HIGH);
+// // 		delay(1500);
+// // 		digitalWrite(62, LOW);
+// 		pulse_length[CHANNEL1] = 1500
+// 	}
+	
+// 	if(dataReceived.pitch > threshholds.pitch + 3){ // add values to account for noise,unsure of val
+// // 		digitalWrite(63, HIGH);
+// // 		delay(2000);
+// // 		digitalWrite(63, LOW);
+// 		pulse_length[CHANNEL2] = 2000
+// 	}
+// 	else if(dataReceived.pitch < threshholds.pitch - 3){ // add values to account for noise,unsure of val
+// // 		digitalWrite(63, HIGH);
+// // 		delay(1200);
+// // 		digitalWrite(63,LOW);
+// 		pulse_length[CHANNEL2] = 1200
+// 	}
+// 	else{
+// // 		digitalWrite(63, HIGH);
+// // 		delay(1500);
+// // 		digitalWrite(63,LOW);
+// 		pulse_length[CHANNEL2] = 1500
+// 	}
+	
+// 	if(dataReceived.roll > threshholds.roll + 3){  //add values to account for noise,unsure of val
+// // 		digitalWrite(64, HIGH);
+// // 		delay(2000);
+// // 		digitalWrite(64, LOW);
+// 		pulse_length[CHANNEL3] = 2000
+// 	}
+// 	else if(dataReceived.roll < threshholds.roll - 3){
+// // 		digitalWrite(64, HIGH);
+// // 		delay(12000);
+// // 		digitalWrite(64, LOW);
+// 		pulse_length[CHANNEL3] = 1200
+// 	}
+// 	else{
+// // 		digitalWrite(64, HIGH);
+// // 		delay(1500);
+// // 		digitalWrite(64, LOW);
+// 		pulse_length[CHANNEL3] = 1500
+// 	}
+	
+// 	if(dataReceived.throttle > prev_throttle + 3){
+// // 		digitalWrite(65, HIGH);
+// // 		delay(2000);
+// // 		digitalWrite(65, LOW);
+// 		pulse_length[CHANNEL4] = 2000
+// 	}
+// 	else if(dataReceived.throttle < prev_throttle - 3){
+// // 		digitalWrite(65, HIGH);
+// // 		delay(12000);
+// // 		digitalWrite(65, LOW);
+// 		pulse_length[CHANNEL4] = 1200
+// 	}
+// 	else{
+// // 		digitalWrite(65, HIGH);
+// // 		delay(1500);
+// // 		digitalWrite(65, LOW);
+// 		pulse_length[CHANNEL4] = 1500
+// 	}
+	
+// 	prev_throttle = dataReceived.throttle;
+// 	newData = false;
+// }
+
 void Rxthreshholding(conData dataReceived){
-	if(dataReceived.yaw > threshholds.yaw + 3){
-// 		digitalWrite(62, HIGH);
-// 		delay(2000);
-// 		digitalWrite(62, LOW);
-		pulse_length[CHANNEL1] = 2000
-	}
-	else if(dataReceived.yaw < threshholds.yaw - 3){
-// 		digitalWrite(62, HIGH);
-// 		delay(1200);
-// 		digitalWrite(62, LOW);
-		pulse_length[CHANNEL1] = 1200
-	}
-	else{
-// 		digitalWrite(62, HIGH);
-// 		delay(1500);
-// 		digitalWrite(62, LOW);
-		pulse_length[CHANNEL1] = 1500
-	}
-	
-	if(dataReceived.pitch > threshholds.pitch + 3){ // add values to account for noise,unsure of val
-// 		digitalWrite(63, HIGH);
-// 		delay(2000);
-// 		digitalWrite(63, LOW);
-		pulse_length[CHANNEL2] = 2000
-	}
-	else if(dataReceived.pitch < threshholds.pitch - 3){ // add values to account for noise,unsure of val
-// 		digitalWrite(63, HIGH);
-// 		delay(1200);
-// 		digitalWrite(63,LOW);
-		pulse_length[CHANNEL2] = 1200
-	}
-	else{
-// 		digitalWrite(63, HIGH);
-// 		delay(1500);
-// 		digitalWrite(63,LOW);
-		pulse_length[CHANNEL2] = 1500
-	}
-	
-	if(dataReceived.roll > threshholds.roll + 3){  //add values to account for noise,unsure of val
-// 		digitalWrite(64, HIGH);
-// 		delay(2000);
-// 		digitalWrite(64, LOW);
-		pulse_length[CHANNEL3] = 2000
-	}
-	else if(dataReceived.roll < threshholds.roll - 3){
-// 		digitalWrite(64, HIGH);
-// 		delay(12000);
-// 		digitalWrite(64, LOW);
-		pulse_length[CHANNEL3] = 1200
-	}
-	else{
-// 		digitalWrite(64, HIGH);
-// 		delay(1500);
-// 		digitalWrite(64, LOW);
-		pulse_length[CHANNEL3] = 1500
-	}
-	
-	if(dataReceived.throttle > prev_throttle + 3){
-// 		digitalWrite(65, HIGH);
-// 		delay(2000);
-// 		digitalWrite(65, LOW);
-		pulse_length[CHANNEL4] = 2000
-	}
-	else if(dataReceived.throttle < prev_throttle - 3){
-// 		digitalWrite(65, HIGH);
-// 		delay(12000);
-// 		digitalWrite(65, LOW);
-		pulse_length[CHANNEL4] = 1200
-	}
-	else{
-// 		digitalWrite(65, HIGH);
-// 		delay(1500);
-// 		digitalWrite(65, LOW);
-		pulse_length[CHANNEL4] = 1500
-	}
-	
-	prev_throttle = dataReceived.throttle;
+	pulse_length[CHANNEL1] = map(dataReceived.yaw, 0, 255, 1000, 2000);
+	pulse_length[CHANNEL2] = map(dataReceived.pitch, 0, 255, 1000, 2000);
+	pulse_length[CHANNEL3] = map(dataReceived.roll, 0, 255, 1000, 2000);
+	pulse_length[CHANNEL4] = map(dataReceived.throttle, 0, 255, 1000, 2000);
+
 	newData = false;
 }
-
 void showData(conData dataReceived) {
     if (newData == true) {
         Serial.print("Data received ");
