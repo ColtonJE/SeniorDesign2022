@@ -256,44 +256,45 @@ void loop() {
 }
 
 //radio functions
-void getData() {
+conData getData() {
     if ( radio.available() ) {
         radio.read( &dataReceived, sizeof(dataReceived) );
         newData = true;
     }
+    return dataReceived;
 }
 
 //old one, worked for angelo
-void Rxthreshholding(){
-	if(dataReceived.yaw > threshholds.yaw + 3 || dataReceived.yaw < threshholds.yaw - 3){
+void Rxthreshholding(conData x){
+	if(x.yaw > threshholds.yaw + 3 || x.yaw < threshholds.yaw - 3){
 		digitalWrite(62, HIGH);
 	}
 	else{
 		digitalWrite(62, LOW);	
 	}
 	
-	if(dataReceived.pitch > threshholds.pitch + 3 || dataReceived.pitch < threshholds.pitch - 3){ // add values to account for noise,unsure of val
+	if(x.pitch > threshholds.pitch + 3 || x.pitch < threshholds.pitch - 3){ // add values to account for noise,unsure of val
 		digitalWrite(63, HIGH);
 	}
 	else{
 		digitalWrite(63, LOW);
 	}
 	
-	if(dataReceived.roll > threshholds.roll + 3 || dataReceived.roll < threshholds.roll - 3){ //add values to account for noise,unsure of val
+	if(x.roll > threshholds.roll + 3 || x.roll < threshholds.roll - 3){ //add values to account for noise,unsure of val
 		digitalWrite(64, HIGH);
 	}
 	else{
 		digitalWrite(64, LOW);
 	}
 	
-	if(dataReceived.throttle > prev_throttle + 3 || dataReceived.throttle < prev_throttle - 3){
+	if(x.throttle > prev_throttle + 3 || x.throttle < prev_throttle - 3){
 		digitalWrite(65, HIGH);
 	}
 	else{
 		digitalWrite(65, LOW);	
 	}
 	
-	prev_throttle = dataReceived.throttle;
+	prev_throttle = x.throttle;
 	newData = false;
 }
 
@@ -387,17 +388,17 @@ void Rxthreshholding(){
 
 // 	newData = false;
 // }
-void showData(conData dataReceived) {
+void showData(conData x) {
     if (newData == true) {
         Serial.print("Data received ");
         Serial.print("\nYaw: " );
-        Serial.print((int)dataReceived.yaw);
+        Serial.print((int)x.yaw);
         Serial.print("\nPitch: ");
-        Serial.print((int)dataReceived.pitch);
+        Serial.print((int)x.pitch);
         Serial.print("\nRoll: ");
-        Serial.print((int)dataReceived.roll);
+        Serial.print((int)x.roll);
         Serial.print("\nThrottle: ");
-        Serial.print((int)dataReceived.throttle);
+        Serial.print((int)x.throttle);
         Serial.print("\n");
         
     }
