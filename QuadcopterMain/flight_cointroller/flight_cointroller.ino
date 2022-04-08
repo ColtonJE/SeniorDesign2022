@@ -47,9 +47,6 @@ bool newData = false;
 #define STARTING 1
 #define STARTED  2
 
-
-//void myRoutine();
-
 //Rx threshhold values, not sure exactly what they need to be yet
 volatile byte prev_yaw = 127;
 volatile byte prev_pitch = 127;
@@ -373,8 +370,8 @@ void calculateAngles() {
 
     if (initialized) {
         // Correct the drift of the gyro with the accelerometer
-        gyro_angle[X] = gyro_angle[X] * 0.9996 + acc_angle[X] * 0.0004;
-        gyro_angle[Y] = gyro_angle[Y] * 0.9996 + acc_angle[Y] * 0.0004;
+        gyro_angle[X] = gyro_angle[X] * 0.9 + acc_angle[X] * 0.1;
+        gyro_angle[Y] = gyro_angle[Y] * 0.9 + acc_angle[Y] * 0.1;
     } else {
         // At very first start, init gyro angles with accelerometer angles
         resetGyroAngles();

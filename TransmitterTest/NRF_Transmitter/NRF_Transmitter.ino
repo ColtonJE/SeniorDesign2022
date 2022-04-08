@@ -20,9 +20,10 @@ typedef struct {
   byte throttle;
 }conData;
 
+conData s = {0,127,127,0};
+conData s2 = {127,127,127,0};
+conData x = {127,127,127,127};
 
-conData dataToSend = {1,1,0,2};
-conData txNum = {69,69,69,69};
 
 
 unsigned long currentMillis;
@@ -42,43 +43,10 @@ void setup() {
     radio.openWritingPipe(slaveAddress);
 }
 
-//====================
+
 
 void loop() {
-    currentMillis = millis();
-    if (currentMillis - prevMillis >= txIntervalMillis) {
-        send();
-        prevMillis = millis();
-    }
-}
-
-//====================
-
-void send() {
-
-    bool rslt;
-    rslt = radio.write( &dataToSend, sizeof(dataToSend) );
-        // Always use sizeof() as it gives the size as the number of bytes.
-        // For example if dataToSend was an int sizeof() would correctly return 2
-
-    Serial.print("Data Sent ");
-    Serial.print((int)dataToSend.yaw);
-    if (rslt) {
-        Serial.println("  Acknowledge received");
-        updateMessage();
-    }
-    else {
-        Serial.println("  Tx failed");
-    }
-}
-
-//================
-
-void updateMessage() {
-        // so you can see that new data is being sent
-    txNum.yaw += 1;
-    if (txNum.yaw > '9') {
-        txNum.yaw = '0';
-    }
-    dataToSend = txNum;
+    radio.write(&s, sizeof(s));
+    radio.write(&s2, sizeof(s2));
+    radio.write(&x, sizeof(x));
 }
