@@ -1,6 +1,6 @@
 
 #include <Wire.h>
-#include <SchedulerARMAVR.h>
+
 //Rx libraries
 #include <SPI.h>
 //#include <nRF24L01.h>
@@ -15,27 +15,15 @@ RF24 radio(CE_PIN, CSN_PIN);
 
 //struct for rx
 typedef struct {
-<<<<<<< Updated upstream
-  float yaw;
-  float pitch;
-  float roll;
-  float throttle;
-=======
   byte yaw;
   byte pitch;
   byte roll;
   byte throttle;
->>>>>>> Stashed changes
 }conData;
 
-
-conData threshholds;
-conData xData;
-conData dataReceived; // this must match dataToSend in the TX
-
+conData threshholds = {127,127,127,0};
+conData dataReceived = {0,0,0,0}; // this must match dataToSend in the TX
 bool newData = false;
-
-
 
 // ------------------- Define some constants for convenience -----------------
 #define CHANNEL1 0
@@ -60,7 +48,7 @@ bool newData = false;
 #define STARTED  2
 
 
-void myRoutine();
+//void myRoutine();
 
 //Rx threshhold values, not sure exactly what they need to be yet
 volatile byte prev_yaw = 127;
@@ -204,25 +192,12 @@ void setup() {
 //	digitalWrite(64, LOW);
 //	digitalWrite(65, LOW);
 	
-<<<<<<< Updated upstream
-    // Configure interrupts for receiver
-    //PCICR  |= (1 << PCIE0);  // Set PCIE0 to enable PCMSK0 scan
-    //PCMSK0 |= (1 << PCINT0); // Set PCINT0 (digital input 8) to trigger an interrupt on state change
-    //PCMSK0 |= (1 << PCINT1); // Set PCINT1 (digital input 9) to trigger an interrupt on state change
-    //PCMSK0 |= (1 << PCINT2); // Set PCINT2 (digital input 10)to trigger an interrupt on state change
-    //PCMSK0 |= (1 << PCINT3); // Set PCINT3 (digital input 11)to trigger an interrupt on state change
-attachInterrupt(digitalPinToInterrupt(62), myRoutine, CHANGE);
-attachInterrupt(digitalPinToInterrupt(63), myRoutine, CHANGE);
-attachInterrupt(digitalPinToInterrupt(64), myRoutine, CHANGE);
-attachInterrupt(digitalPinToInterrupt(65), myRoutine, CHANGE);
-=======
     
 //attachInterrupt(digitalPinToInterrupt(62), myRoutine, HIGH);
 //attachInterrupt(digitalPinToInterrupt(63), myRoutine, HIGH);
 //attachInterrupt(digitalPinToInterrupt(64), myRoutine, HIGH);
 //attachInterrupt(digitalPinToInterrupt(65), myRoutine, HIGH);
 //attachInterrupt(digitalPinToInterrupt(),myRoutine, HIGH);
->>>>>>> Stashed changes
     
 	
     period = (1000000/FREQ) ; // Sampling period in µs
@@ -233,36 +208,16 @@ attachInterrupt(digitalPinToInterrupt(65), myRoutine, CHANGE);
     // Turn LED off now setup is done
     //digitalWrite(13, LOW);
 	
-	threshholds.yaw = 127;
-	threshholds.pitch = 127;
-	threshholds.roll = 127;
-	threshholds.throttle = 0;
-
-  Scheduler.startLoop(loop1);
- 
+	
 }
 
 
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * Main program loop
  */
 //dont forget to call getdata and threshhold
-void loop() 
-{
-
-  Serial.println("+========In main loop=======+");
+void loop() {
   
-  
-<<<<<<< Updated upstream
-  showData(xData);
-  Rxthreshholding(xData);
-
-  
-// 1. First, read raw values from MPU-6050
-=======
 	getData();
   
   if(newData)
@@ -274,12 +229,10 @@ void loop()
     showData();
     newData = false;
   }
-  
  
 
   
     // 1. First, read raw values from MPU-6050
->>>>>>> Stashed changes
     readSensor();
 
     // 2. Calculate angles from gyro & accelerometer's values
@@ -291,12 +244,7 @@ void loop()
     // 4. Calculate errors comparing angular motions to set points
     calculateErrors();
 
-<<<<<<< Updated upstream
-    if (isStarted()) 
-    {
-=======
     if (isStarted()) {
->>>>>>> Stashed changes
         // 5. Calculate motors speed with PID controller
         pidController();
 
@@ -306,92 +254,22 @@ void loop()
     // 6. Apply motors speed
     applyMotorSpeed();
 
-<<<<<<< Updated upstream
-    delay(3000);
-=======
     
     
     
->>>>>>> Stashed changes
 }
-
-void loop1()
-{
-    Serial.println("+========In loop 1=======+");
-
-  xData = getData();
-  
-  delay(1000);
-}
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //radio functions
-conData getData() {
+void getData() {
+
     if ( radio.available() ) {
         radio.read( &dataReceived, sizeof(dataReceived) );
         newData = true;
     }
-    return dataReceived;
+    
 }
 
 
-<<<<<<< Updated upstream
-
-//working on this rn
-void Rxthreshholding(conData x)
-{
-	if(x.yaw > threshholds.yaw + 3 || x.yaw < threshholds.yaw - 3){
-		digitalWrite(62, HIGH);
-	}
-	else{
-		digitalWrite(62, LOW);	
-	}
-	
-	if(x.pitch > threshholds.pitch + 3 || x.pitch < threshholds.pitch - 3){ // add values to account for noise,unsure of val
-		digitalWrite(63, HIGH);
-	}
-	else{
-		digitalWrite(63, LOW);
-	}
-	
-	if(x.roll > threshholds.roll + 3 || x.roll < threshholds.roll - 3){ //add values to account for noise,unsure of val
-		digitalWrite(64, HIGH);
-	}
-	else{
-		digitalWrite(64, LOW);
-	}
-	
-	if(x.throttle > prev_throttle + 3 || x.throttle < prev_throttle - 3){
-		digitalWrite(65, HIGH);
-	}
-	else{
-		digitalWrite(65, LOW);	
-	}
-	
-	prev_throttle = xData.throttle;
-	newData = false;
-}
-
-
-void showData(conData x) 
-{
-    if (newData == true) 
-    {
-        Serial.println("\n+----------------------------------------------------+");
-        Serial.print("Data received ");
-        Serial.print("\nYaw: " );
-        Serial.print((int)x.yaw);
-        Serial.print("\nPitch: ");
-        Serial.print((int)x.pitch);
-        Serial.print("\nRoll: ");
-        Serial.print((int)x.roll);
-        Serial.print("\nThrottle: ");
-        Serial.print((int)x.throttle);
-=======
 void showData() {
         Serial.println("\n+--------------------------------------------+");
         Serial.print("Data received \n");
@@ -403,14 +281,8 @@ void showData() {
         Serial.print((int)dataReceived.roll);
         Serial.print(" Throttle: ");
         Serial.print((int)dataReceived.throttle);
->>>>>>> Stashed changes
         Serial.print("\n");
-        Serial.println("+----------------------------------------------------+");
 
-<<<<<<< Updated upstream
-        
-    }
-=======
         Serial.print((int)pulse_length[CHANNEL1]);
         Serial.print(" ");
      Serial.print((int)pulse_length[CHANNEL2]);
@@ -433,7 +305,6 @@ void showData() {
      Serial.print(isStarted());
      Serial.println("\n+--------------------------------------------+\n");  
       
->>>>>>> Stashed changes
 }
 
 /**
@@ -475,8 +346,7 @@ void applyMotorSpeed() {
 /**
  * Request raw values from MPU6050.
  */
-void readSensor() 
-{
+void readSensor() {
     Wire.beginTransmission(MPU_ADDRESS); // Start communicating with the MPU-6050
     Wire.write(0x3B);                    // Send the requested starting register
     Wire.endTransmission();              // End the transmission
@@ -648,8 +518,8 @@ void calculateErrors() {
 void configureChannelMapping() {
     mode_mapping[YAW]      = CHANNEL1;
     mode_mapping[PITCH]    = CHANNEL2;
-    mode_mapping[ROLL]     = CHANNEL4;
-    mode_mapping[THROTTLE] = CHANNEL3;
+    mode_mapping[ROLL]     = CHANNEL3;
+    mode_mapping[THROTTLE] = CHANNEL4;
 }
 
 /**
@@ -762,12 +632,12 @@ float minMax(float value, float min_value, float max_value) {
  */
 bool isStarted() {
     // When left stick is moved in the bottom left corner
-    if (status == STOPPED && dataReceived.yaw <= 5 && dataReceived.throttle <= 5) {
+    if (status == STOPPED && pulse_length[mode_mapping[YAW]] <= 1012 && pulse_length[mode_mapping[THROTTLE]] <= 1012) {
         status = STARTING;
     }
 
     // When left stick is moved back in the center position
-    if (status == STARTING && dataReceived.yaw == 127 && dataReceived.yaw <= 127) {
+    if (status == STARTING && pulse_length[mode_mapping[YAW]] >= 1480 && pulse_length[mode_mapping[YAW]] <= 1520 && pulse_length[mode_mapping[THROTTLE]] <= 1012) {
         status = STARTED;
 
         // Reset PID controller's variables to prevent bump start
@@ -777,7 +647,7 @@ bool isStarted() {
     }
 
     // When left stick is moved in the bottom right corner
-    if (status == STARTED && dataReceived.yaw <= 255 && dataReceived.throttle <= 5) {
+    if (status == STARTED && pulse_length[mode_mapping[YAW]] >= 1988 && pulse_length[mode_mapping[THROTTLE]] <= 1012) {
         status = STOPPED;
         // Make sure to always stop motors when status is STOPPED
         stopAll();
@@ -895,88 +765,4 @@ bool isBatteryConnected() {
     battery_voltage = battery_voltage * 0.92 + (analogRead(0) + 65) * 0.09853;
 
     return battery_voltage < 1240 && battery_voltage > 800;
-}
-
-
-//old ISR
-/**
- * This Interrupt Sub Routine is called each time input 8, 9, 10 or 11 changed state.
- * Read the receiver signals in order to get flight instructions.
- *
- * This routine must be as fast as possible to prevent main program to be messed up.
- * The trick here is to use port registers to read pin state.
- * Doing (PINB & B00000001) is the same as digitalRead(8) with the advantage of using less CPU loops.
- * It is less convenient but more efficient, which is the most important here.
- *
- * @see https://www.arduino.cc/en/Reference/PortManipulation
- * @see https://www.firediy.fr/article/utiliser-sa-radiocommande-avec-un-arduino-drone-ch-6
- */
-void myRoutine() {
-        current_time = micros();
-
-        // Channel 1 -------------------------------------------------
-        if (digitalRead(62)) 
-        {                                        // pin 62 high ?
-            if (previous_state[CHANNEL1] == LOW) 
-            {                     //  changed from 0 to 1 (rising edge)
-                previous_state[CHANNEL1] = HIGH;                       // Save current state
-                timer[CHANNEL1] = current_time;                        // Save current time
-            }
-            
-        } 
-        else if (previous_state[CHANNEL1] == HIGH) 
-        {                 //  changed from 1 to 0 (falling edge)
-            previous_state[CHANNEL1] = LOW;                            // Save current state
-            pulse_length[CHANNEL1] = current_time - timer[CHANNEL1];   // Calculate pulse duration & save it
-        }
-
-        // Channel 2 -------------------------------------------------
-        if (digitalRead(63)) 
-        {                                        // pin 63 high ?
-            if (previous_state[CHANNEL2] == LOW) 
-            {                     //  changed from 0 to 1 (rising edge)
-                previous_state[CHANNEL2] = HIGH;                       // Save current state
-                timer[CHANNEL2] = current_time;                        // Save current time
-            }
-            
-        } 
-        else if (previous_state[CHANNEL2] == HIGH) 
-        {                 //  changed from 1 to 0 (falling edge)
-            previous_state[CHANNEL2] = LOW;                            // Save current state
-            pulse_length[CHANNEL2] = current_time - timer[CHANNEL2];   // Calculate pulse duration & save it
-        }
-        
-
-        // Channel 3 -------------------------------------------------
-        if (digitalRead(64)) 
-        {                                        // pin 64 high ?
-            if (previous_state[CHANNEL3] == LOW) 
-            {                     //  changed from 0 to 1 (rising edge)
-                previous_state[CHANNEL3] = HIGH;                       // Save current state
-                timer[CHANNEL3] = current_time;                        // Save current time
-            }
-            
-        } 
-        else if (previous_state[CHANNEL3] == HIGH) 
-        {                 //  changed from 1 to 0 (falling edge)
-            previous_state[CHANNEL3] = LOW;                            // Save current state
-            pulse_length[CHANNEL3] = current_time - timer[CHANNEL3];   // Calculate pulse duration & save it
-        }
-
-        
-        // Channel 4 -------------------------------------------------
-        if (digitalRead(65)) 
-        {                                        // pin 65 high ?
-            if (previous_state[CHANNEL4] == LOW) 
-            {                     //  changed from 0 to 1 (rising edge)
-                previous_state[CHANNEL4] = HIGH;                       // Save current state
-                timer[CHANNEL4] = current_time;                        // Save current time
-            }
-            
-        } 
-        else if (previous_state[CHANNEL4] == HIGH) 
-        {                 //  changed from 1 to 0 (falling edge)
-            previous_state[CHANNEL4] = LOW;                            // Save current state
-            pulse_length[CHANNEL4] = current_time - timer[CHANNEL4];   // Calculate pulse duration & save it
-        }
 }
