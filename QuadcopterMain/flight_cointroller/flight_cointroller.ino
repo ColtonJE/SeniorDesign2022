@@ -15,10 +15,10 @@ RF24 radio(CE_PIN, CSN_PIN);
 
 //struct for rx
 typedef struct {
-  volatile byte yaw;
-  volatile byte pitch;
-  volatile byte roll;
-  volatile byte throttle;
+  byte yaw;
+  byte pitch;
+  byte roll;
+  byte throttle;
 }conData;
 
 conData threshholds = {127,127,127,0};
@@ -225,16 +225,16 @@ void setup() {
 //dont forget to call getdata and threshhold
 void loop() {
   
-	//getData();
-	//Rxthreshholding();
+	getData();
+	
 
-//  if(newData)
-//  {
-//    pulse_length[CHANNEL1] = map(dataReceived.yaw, 0, 255, 1000, 2000);
-//    pulse_length[CHANNEL2] = map(dataReceived.pitch, 0, 255, 1000, 2000);
-//    pulse_length[CHANNEL3] = map(dataReceived.roll, 0, 255, 1000, 2000);
-//    pulse_length[CHANNEL4] = map(dataReceived.throttle, 0, 255, 1000, 2000);
-//  }
+  if(newData)
+  {
+    pulse_length[CHANNEL1] = map(dataReceived.yaw, 0, 255, 1000, 2000);
+    pulse_length[CHANNEL2] = map(dataReceived.pitch, 0, 255, 1000, 2000);
+    pulse_length[CHANNEL3] = map(dataReceived.roll, 0, 255, 1000, 2000);
+    pulse_length[CHANNEL4] = map(dataReceived.throttle, 0, 255, 1000, 2000);
+  }
     // 1. First, read raw values from MPU-6050
     readSensor();
 
@@ -274,32 +274,38 @@ void getData() {
 
 
 void showData() {
-        Serial.println("\n+--------------------------------------------+");
-        Serial.print("Data received ");
-        Serial.print("\nYaw: " );
-        Serial.print((int)dataReceived.yaw);
-        Serial.print("\nPitch: ");
-        Serial.print((int)dataReceived.pitch);
-        Serial.print("\nRoll: ");
-        Serial.print((int)dataReceived.roll);
-        Serial.print("\nThrottle: ");
-        Serial.print((int)dataReceived.throttle);
-        Serial.print("\n");
+   Serial.println("\n+--------------------------------------------+");
+   Serial.print("Data received: \n");
+   Serial.print("Yaw: " );
+   Serial.print((int)dataReceived.yaw);
+   Serial.print("  Pitch: ");
+   Serial.print((int)dataReceived.pitch);
+   Serial.print("  Roll: ");
+   Serial.print((int)dataReceived.roll);
+   Serial.print("  Throttle: ");
+   Serial.print((int)dataReceived.throttle);
+   Serial.print("\n\n");
 
-        Serial.println((int)pulse_length[CHANNEL1]);
-     Serial.println((int)pulse_length[CHANNEL2]);
-     Serial.println((int)pulse_length[CHANNEL3]);
-     Serial.println((int)pulse_length[CHANNEL4]);
+   Serial.print("Data mapped: \n");
+   Serial.print("Yaw: " );
+   Serial.print((int)pulse_length[CHANNEL1]);
+   Serial.print("  Pitch: ");
+   Serial.print((int)pulse_length[CHANNEL2]);
+   Serial.print("  Roll: ");
+   Serial.print((int)pulse_length[CHANNEL3]);
+   Serial.print("  Throttle: ");
+   Serial.print((int)pulse_length[CHANNEL4]);
+   Serial.print("\n\n");
 
-     Serial.println("Raw gyro values:");
-     Serial.println(gyro_raw[X]);
-     Serial.println(gyro_raw[Y]);
-     Serial.println(gyro_raw[Z]);
+   Serial.println("Raw gyro values:");
+   Serial.println(gyro_raw[X]);
+   Serial.println(gyro_raw[Y]);
+   Serial.println(gyro_raw[Z]);
 
 
-     Serial.print("Started: ");
-     Serial.print(isStarted());
-     Serial.println("\n+--------------------------------------------+\n");  
+   Serial.print("Started: ");
+   Serial.print(isStarted());
+   Serial.println("\n+--------------------------------------------+\n");  
       
 }
 
