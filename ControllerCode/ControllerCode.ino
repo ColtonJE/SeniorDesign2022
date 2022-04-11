@@ -54,10 +54,10 @@ void setup() {
 void loop() {
   //read the values from the joysticks
   //A0 = yaw, A1 = pitch, A2 = roll, A3 = throttle
-  sendData.yaw      = map( analogRead(A0), 0, 1024, 0, 255 ); //map values inverted because joystick is upside down
+  sendData.yaw      = map( analogRead(A0), 0, 1024, 255, 0 ); //map values inverted because joystick is upside down
   sendData.pitch    = map( analogRead(A1), 0, 1024, 255, 0 ); 
   sendData.roll     = map( analogRead(A2), 0, 1024, 0, 255 );
-  sendData.throttle = map( analogRead(A3), 0, 1024, 255, 0); //map values inverted because joystick is upside down
+  sendData.throttle = map( analogRead(A3), 0, 1024, 0, 255); //map values inverted because joystick is upside down
   //For testing ============================
  
  radio.write( &sendData, sizeof(sendData) );
