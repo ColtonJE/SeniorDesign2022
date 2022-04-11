@@ -47,9 +47,6 @@ bool newData = false;
 #define STARTING 1
 #define STARTED  2
 
-
-//void myRoutine();
-
 //Rx threshhold values, not sure exactly what they need to be yet
 volatile byte prev_yaw = 127;
 volatile byte prev_pitch = 127;
@@ -61,7 +58,7 @@ volatile byte prev_throttle = 127;
 volatile byte previous_state[4];
 
 // Duration of the pulse on each channel of the receiver in µs (must be within 1000µs & 2000µs)
-volatile unsigned int pulse_length[4] = {1500, 1500, 1000, 1500};
+volatile unsigned int pulse_length[4] = {1500, 1500, 1500, 1000};
 
 // Used to calculate pulse duration on each channel
 volatile unsigned long current_time;
@@ -164,58 +161,51 @@ void setup() {
     radio.setDataRate( RF24_250KBPS );
     radio.openReadingPipe(1, thisSlaveAddress);
     radio.startListening();
-	
+  
     // Turn LED on during setup
-    pinMode(13, OUTPUT);
-    digitalWrite(13, HIGH);
+    //pinMode(13, OUTPUT);
+    //digitalWrite(13, HIGH);
 
     //esc output pins set to outputs
-	//DDRD |= B0001000000;
-	//DDRA |= B000000000000000000000010000000;
-	//DDRC |= B0000000000000000000000000001010;
-	pinMode(30, OUTPUT);
-	pinMode(32, OUTPUT);
-	pinMode(34, OUTPUT);
-	pinMode(36, OUTPUT);
-	
+  
+  pinMode(30, OUTPUT);
+  pinMode(32, OUTPUT);
+  pinMode(34, OUTPUT);
+  pinMode(36, OUTPUT);
+  
     setupMpu6050Registers();
 
     calibrateMpu6050();
 
     configureChannelMapping();
 
-	// set output pins so we can manually trigger their interrupts
-	pinMode(62, OUTPUT);
-	pinMode(63, OUTPUT);
-	pinMode(64, OUTPUT);
-	pinMode(65, OUTPUT);
-	digitalWrite(62, LOW);
-	digitalWrite(63, LOW);
-	digitalWrite(64, LOW);
-	digitalWrite(65, LOW);
-	
-    // Configure interrupts for receiver
-    //PCICR  |= (1 << PCIE0);  // Set PCIE0 to enable PCMSK0 scan
-    //PCMSK0 |= (1 << PCINT0); // Set PCINT0 (digital input 8) to trigger an interrupt on state change
-    //PCMSK0 |= (1 << PCINT1); // Set PCINT1 (digital input 9) to trigger an interrupt on state change
-    //PCMSK0 |= (1 << PCINT2); // Set PCINT2 (digital input 10)to trigger an interrupt on state change
-    //PCMSK0 |= (1 << PCINT3); // Set PCINT3 (digital input 11)to trigger an interrupt on state change
+  // set output pins so we can manually trigger their interrupts
+//  pinMode(62, OUTPUT);
+//  pinMode(63, OUTPUT);
+//  pinMode(64, OUTPUT);
+//  pinMode(65, OUTPUT);
+//  digitalWrite(62, LOW);
+//  digitalWrite(63, LOW);
+//  digitalWrite(64, LOW);
+//  digitalWrite(65, LOW);
+  
+    
 //attachInterrupt(digitalPinToInterrupt(62), myRoutine, HIGH);
 //attachInterrupt(digitalPinToInterrupt(63), myRoutine, HIGH);
 //attachInterrupt(digitalPinToInterrupt(64), myRoutine, HIGH);
 //attachInterrupt(digitalPinToInterrupt(65), myRoutine, HIGH);
 //attachInterrupt(digitalPinToInterrupt(),myRoutine, HIGH);
     
-	
+  
     period = (1000000/FREQ) ; // Sampling period in µs
 
     // Initialize loop_timer
     loop_timer = micros();
 
     // Turn LED off now setup is done
-    digitalWrite(13, LOW);
-	
-	
+    //digitalWrite(13, LOW);
+  
+  
 }
 
 
@@ -225,16 +215,20 @@ void setup() {
 //dont forget to call getdata and threshhold
 void loop() {
   
-	getData();
-	
-
+  getData();
+  
   if(newData)
   {
     pulse_length[CHANNEL1] = map(dataReceived.yaw, 0, 255, 1000, 2000);
     pulse_length[CHANNEL2] = map(dataReceived.pitch, 0, 255, 1000, 2000);
     pulse_length[CHANNEL3] = map(dataReceived.roll, 0, 255, 1000, 2000);
     pulse_length[CHANNEL4] = map(dataReceived.throttle, 0, 255, 1000, 2000);
+    showData();
+    newData = false;
   }
+ 
+
+  
     // 1. First, read raw values from MPU-6050
     readSensor();
 
@@ -247,7 +241,7 @@ void loop() {
     // 4. Calculate errors comparing angular motions to set points
     calculateErrors();
 
-    if (isStarted() || !isStarted()) {
+    if (isStarted()) {
         // 5. Calculate motors speed with PID controller
         pidController();
 
@@ -257,9 +251,9 @@ void loop() {
     // 6. Apply motors speed
     applyMotorSpeed();
 
-    showData();
-    //newData = false;
-    delay(1000);
+    
+    
+    
 }
 
 //radio functions
@@ -274,38 +268,39 @@ void getData() {
 
 
 void showData() {
-   Serial.println("\n+--------------------------------------------+");
-   Serial.print("Data received: \n");
-   Serial.print("Yaw: " );
-   Serial.print((int)dataReceived.yaw);
-   Serial.print("  Pitch: ");
-   Serial.print((int)dataReceived.pitch);
-   Serial.print("  Roll: ");
-   Serial.print((int)dataReceived.roll);
-   Serial.print("  Throttle: ");
-   Serial.print((int)dataReceived.throttle);
-   Serial.print("\n\n");
+        Serial.println("\n+--------------------------------------------+");
+        Serial.print("Data received \n");
+        Serial.print(" Yaw: " );
+        Serial.print((int)dataReceived.yaw);
+        Serial.print(" Pitch: ");
+        Serial.print((int)dataReceived.pitch);
+        Serial.print(" Roll: ");
+        Serial.print((int)dataReceived.roll);
+        Serial.print(" Throttle: ");
+        Serial.print((int)dataReceived.throttle);
+        Serial.print("\n");
 
-   Serial.print("Data mapped: \n");
-   Serial.print("Yaw: " );
-   Serial.print((int)pulse_length[CHANNEL1]);
-   Serial.print("  Pitch: ");
-   Serial.print((int)pulse_length[CHANNEL2]);
-   Serial.print("  Roll: ");
-   Serial.print((int)pulse_length[CHANNEL3]);
-   Serial.print("  Throttle: ");
-   Serial.print((int)pulse_length[CHANNEL4]);
-   Serial.print("\n\n");
+        Serial.print((int)pulse_length[CHANNEL1]);
+        Serial.print(" ");
+     Serial.print((int)pulse_length[CHANNEL2]);
+     Serial.print(" ");
+     Serial.print((int)pulse_length[CHANNEL3]);
+     Serial.print(" ");
+     Serial.print((int)pulse_length[CHANNEL4]);
+     Serial.print("\n ");
 
-   Serial.println("Raw gyro values:");
-   Serial.println(gyro_raw[X]);
-   Serial.println(gyro_raw[Y]);
-   Serial.println(gyro_raw[Z]);
+//     Serial.println("Angle gyro values:");
+//     Serial.print(gyro_angle[X]);
+//     Serial.print("   ");
+//     Serial.print(gyro_angle[Y]);
+//     Serial.print("   ");
+//     Serial.print(gyro_angle[Z]);
 
 
-   Serial.print("Started: ");
-   Serial.print(isStarted());
-   Serial.println("\n+--------------------------------------------+\n");  
+
+     Serial.print("Started: ");
+     Serial.print(isStarted());
+     Serial.println("\n+--------------------------------------------+\n");  
       
 }
 
@@ -325,24 +320,22 @@ void applyMotorSpeed() {
     loop_timer = now;
 
     // Set pins 30, 32, 34, 36 HIGH
-    //PORTD |= B01000000;
-	//PORTA |= B10000000;
-	//PORTC |= B00001010;
-	digitalWrite(30,HIGH);
-	digitalWrite(32,HIGH);
-	digitalWrite(34,HIGH);
-	digitalWrite(36,HIGH);
-	
+
+  digitalWrite(30,HIGH);
+  digitalWrite(32,HIGH);
+  digitalWrite(34,HIGH);
+  digitalWrite(36,HIGH);
+  
     // Wait until all pins 30 32 34 36 are LOW
-    //while (PORTD == B01000000 || PORTA == B10000000 || PORTC == B00001010;) 
-	while (digitalRead(30) == 1 || digitalRead(32) == 1 || digitalRead(34) == 1 || digitalRead(36) == 1) {
+
+  while (digitalRead(30) == 1 || digitalRead(32) == 1 || digitalRead(34) == 1 || digitalRead(36) == 1) {
         now        = micros();
         difference = now - loop_timer;
 
-        if (difference >= pulse_length_esc1) digitalWrite(30,LOW); //PORTD &= B10111111; // Set pin #30 LOW
-        if (difference >= pulse_length_esc2) digitalWrite(32,LOW); //PORTA &= B01111111; // Set pin #32 LOW
-        if (difference >= pulse_length_esc3) digitalWrite(34,LOW); //PORTC &= B11111101; // Set pin #34 LOW
-        if (difference >= pulse_length_esc4) digitalWrite(36,LOW); //PORTC &= B11110111; // Set pin #36 LOW
+        if (difference >= pulse_length_esc1) digitalWrite(30,LOW); 
+        if (difference >= pulse_length_esc2) digitalWrite(32,LOW); 
+        if (difference >= pulse_length_esc3) digitalWrite(34,LOW); 
+        if (difference >= pulse_length_esc4) digitalWrite(36,LOW); 
     }
 } 
 
@@ -377,8 +370,8 @@ void calculateAngles() {
 
     if (initialized) {
         // Correct the drift of the gyro with the accelerometer
-        gyro_angle[X] = gyro_angle[X] * 0.9996 + acc_angle[X] * 0.0004;
-        gyro_angle[Y] = gyro_angle[Y] * 0.9996 + acc_angle[Y] * 0.0004;
+        gyro_angle[X] = gyro_angle[X] * 0.9 + acc_angle[X] * 0.1;
+        gyro_angle[Y] = gyro_angle[Y] * 0.9 + acc_angle[Y] * 0.1;
     } else {
         // At very first start, init gyro angles with accelerometer angles
         resetGyroAngles();
@@ -579,20 +572,20 @@ void calibrateMpu6050() {
 
         // Generate low throttle pulse to init ESC and prevent them beeping
         digitalWrite(30,HIGH);
-	digitalWrite(32,HIGH);
-	digitalWrite(34,HIGH);
-	digitalWrite(36,HIGH);
+  digitalWrite(32,HIGH);
+  digitalWrite(34,HIGH);
+  digitalWrite(36,HIGH);
         //PORTD |= B01000000;
-		//PORTA |= B10000000;
-		//PORTC |= B00001010;
-		delayMicroseconds(1000); // Wait 1000µs
-		//PORTD &= B10111111;
-		//PORTA &= B01111111;
-		//PORTC &= B11110101;
+    //PORTA |= B10000000;
+    //PORTC |= B00001010;
+    delayMicroseconds(1000); // Wait 1000µs
+    //PORTD &= B10111111;
+    //PORTA &= B01111111;
+    //PORTC &= B11110101;
         digitalWrite(30,LOW);
-	digitalWrite(32,LOW);
-	digitalWrite(34,LOW);
-	digitalWrite(36,LOW);
+  digitalWrite(32,LOW);
+  digitalWrite(34,LOW);
+  digitalWrite(36,LOW);
 
         // Just wait a bit before next loop
         delay(3);
@@ -602,6 +595,10 @@ void calibrateMpu6050() {
     gyro_offset[X] /= max_samples;
     gyro_offset[Y] /= max_samples;
     gyro_offset[Z] /= max_samples;
+
+//      gyro_offset[X] = 115;
+//      gyro_offset[Y] = 27;
+//      gyro_offset[Z] = 18;
 }
 
 /**
