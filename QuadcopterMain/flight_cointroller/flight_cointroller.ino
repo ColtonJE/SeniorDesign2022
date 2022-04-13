@@ -183,22 +183,6 @@ void setup() {
 
     configureChannelMapping();
 
-  // set output pins so we can manually trigger their interrupts
-//  pinMode(62, OUTPUT);
-//  pinMode(63, OUTPUT);
-//  pinMode(64, OUTPUT);
-//  pinMode(65, OUTPUT);
-//  digitalWrite(62, LOW);
-//  digitalWrite(63, LOW);
-//  digitalWrite(64, LOW);
-//  digitalWrite(65, LOW);
-  
-    
-//attachInterrupt(digitalPinToInterrupt(62), myRoutine, HIGH);
-//attachInterrupt(digitalPinToInterrupt(63), myRoutine, HIGH);
-//attachInterrupt(digitalPinToInterrupt(64), myRoutine, HIGH);
-//attachInterrupt(digitalPinToInterrupt(65), myRoutine, HIGH);
-//attachInterrupt(digitalPinToInterrupt(),myRoutine, HIGH);
     
   
     period = (1000000/FREQ) ; // Sampling period in µs
@@ -325,34 +309,37 @@ void applyMotorSpeed() {
 
     // Set pins 30, 32, 34, 36 HIGH
 
-REG_PIOD_SODR = 1 << 9;
+//REG_PIOD_SODR = 1 << 9;
 //PIOD ->  PIO_SODR = 1 << 9;
 //PIOD -> PIO_CODR = 1 << 9; //clear
 
-REG_PIOD_SODR = 1 << 10;
+//REG_PIOD_SODR = 1 << 10;
 //PIOD ->  PIO_SODR = 1 << 10;
 //PIOD -> PIO_CODR = 1 << 10; //clear
 
-REG_PIOC_SODR = 1 << 2;
+//REG_PIOC_SODR = 1 << 2;
 //PIOC ->  PIO_SODR = 1 << 2;
 //PIOC -> PIO_CODR = 1 << 2; //clear
 
-REG_PIOC_SODR = 1<< 4;
+//REG_PIOC_SODR = 1<< 4;
 //PIOC ->  PIO_SODR = 1 << 4;
 //PIOC -> PIO_CODR = 1 << 4; //clear
+  
+PIOD ->  PIO_SODR = 0x3 << 9;
+PIOC ->  PIO_SODR = 0x5 << 2;
 
 
 
     // Wait until all pins 30 32 34 36 are LOW
 
-  while ((REG_PIOD_PDSR) == 0x0000009 || (REG_PIOD_PDSR) == 0x0000000A || (REG_PIOC_PDSR) == 0x00000002 ||(REG_PIOC_PDSR) == 0x00000004) {
+  while (REG_PIOD_PDSR == 0b00000000000000000000010000000000 || REG_PIOD_PDSR == 0b00000000000000000000001000000000 || REG_PIOC_PDSR == 0b00000000000000000000000000010000 || REG_PIOC_PDSR == 0b00000000000000000000000000000100) {
         now        = micros();
         difference = now - loop_timer;
 
-        if (difference >= pulse_length_esc1) REG_PIOD_CODR = 1 << 9; 
-        if (difference >= pulse_length_esc2) REG_PIOD_CODR  = 1 << 10; 
-        if (difference >= pulse_length_esc3) REG_PIOC_CODR = 1 << 2; 
-        if (difference >= pulse_length_esc4) REG_PIOC_CODR = 1 << 4; 
+        if (difference >= pulse_length_esc1) REG_PIOD_CODR = 0b00000000000000000000001000000000; 
+        if (difference >= pulse_length_esc2) REG_PIOD_CODR = 0b00000000000000000000010000000000; 
+        if (difference >= pulse_length_esc3) REG_PIOC_CODR = 0b00000000000000000000000000000100; 
+        if (difference >= pulse_length_esc4) REG_PIOC_CODR = 0b00000000000000000000000000010000; 
     }
 } 
 
@@ -590,36 +577,41 @@ void calibrateMpu6050() {
         // Generate low throttle pulse to init ESC and prevent them beeping
 
     
-REG_PIOD_SODR = 1 << 9;
+//REG_PIOD_SODR = 1 << 9;
 //PIOD ->  PIO_SODR = 1 << 9;
 //PIOD -> PIO_CODR = 1 << 9; //clear
 
-REG_PIOD_SODR = 1 << 10;
+//REG_PIOD_SODR = 1 << 10;
 //PIOD ->  PIO_SODR = 1 << 10;
 //PIOD -> PIO_CODR = 1 << 10; //clear
 
-REG_PIOC_SODR = 1 << 2;
+//REG_PIOC_SODR = 1 << 2;
 //PIOC ->  PIO_SODR = 1 << 2;
 //PIOC -> PIO_CODR = 1 << 2; //clear
 
-REG_PIOC_SODR = 1<< 4;
+//REG_PIOC_SODR = 1<< 4;
 //PIOC ->  PIO_SODR = 1 << 4;
 //PIOC -> PIO_CODR = 1 << 4; //clear
-    
+      
+    PIOD ->  PIO_SODR = 0x3 << 9;
+    PIOC ->  PIO_SODR = 0x5 << 2;
 
     delayMicroseconds(1000); // Wait 1000µs
 
+    PIOD ->  PIO_CODR = 0x3 << 9;
+    PIOC ->  PIO_CODR = 0x5 << 2;
+      
     //PIOD ->  PIO_SODR = 1 << 9;
-    REG_PIOD_CODR = 1 << 9; //clear
+    //REG_PIOD_CODR = 1 << 9; //clear
     
     //PIOD ->  PIO_SODR = 1 << 10;
-    REG_PIOD_CODR= 1 << 10; //clear
+    //REG_PIOD_CODR= 1 << 10; //clear
     
     //PIOC ->  PIO_SODR = 1 << 2;
-    REG_PIOC_CODR = 1 << 2; //clear
+    //REG_PIOC_CODR = 1 << 2; //clear
     
     //PIOC ->  PIO_SODR = 1 << 4;
-    REG_PIOC_CODR = 1 << 4; //clear
+    //REG_PIOC_CODR = 1 << 4; //clear
 
         // Just wait a bit before next loop
         delay(3);
