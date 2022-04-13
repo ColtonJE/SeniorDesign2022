@@ -6,8 +6,10 @@
 //#include <nRF24L01.h>
 #include <RF24.h>
 
-#define CE_PIN   9
-#define CSN_PIN 10
+
+#define CE_PIN   25
+#define CSN_PIN 23
+
 
 const byte thisSlaveAddress[5] = {'R','x','A','A','A'};
 
@@ -15,18 +17,14 @@ RF24 radio(CE_PIN, CSN_PIN);
 
 //struct for rx
 typedef struct {
-  volatile byte yaw;
-  volatile byte pitch;
-  volatile byte roll;
-  volatile byte throttle;
+  byte yaw;
+  byte pitch;
+  byte roll;
+  byte throttle;
 }conData;
 
-<<<<<<< Updated upstream:QuadcopterMain/flight_cointroller.ino
-conData dataReceived; // this must match dataToSend in the TX
-=======
 conData threshholds = {127,127,127,0};
 conData dataReceived = {0,0,0,0}; // this must match dataToSend in the TX
->>>>>>> Stashed changes:QuadcopterMain/flight_cointroller/flight_cointroller.ino
 bool newData = false;
 
 // ------------------- Define some constants for convenience -----------------
@@ -51,13 +49,18 @@ bool newData = false;
 #define STARTING 1
 #define STARTED  2
 
+//Rx threshhold values, not sure exactly what they need to be yet
+volatile byte prev_yaw = 127;
+volatile byte prev_pitch = 127;
+volatile byte prev_roll = 127;
+volatile byte prev_throttle = 127;
 
 // ---------------- Receiver variables ---------------------------------------
 // Previous state of each channel (HIGH or LOW)
 volatile byte previous_state[4];
 
 // Duration of the pulse on each channel of the receiver in µs (must be within 1000µs & 2000µs)
-volatile unsigned int pulse_length[4] = {1500, 1500, 1000, 1500};
+volatile unsigned int pulse_length[4] = {1500, 1500, 1500, 1000};
 
 // Used to calculate pulse duration on each channel
 volatile unsigned long current_time;
@@ -152,7 +155,7 @@ int battery_voltage;
 void setup() {
     // Start I2C communication
     Wire.begin();
-    Wire.setClock(400000) // set I2C speed to 400000 Hz
+    Wire.setClock(400000); // set I2C speed to 400000 Hz
     
     //settup Rx 
     Serial.begin(9600);
@@ -160,57 +163,76 @@ void setup() {
     radio.setDataRate( RF24_250KBPS );
     radio.openReadingPipe(1, thisSlaveAddress);
     radio.startListening();
-	
+  
     // Turn LED on during setup
-    pinMode(13, OUTPUT);
-    digitalWrite(13, HIGH);
+    //pinMode(13, OUTPUT);
+    //digitalWrite(13, HIGH);
 
     //esc output pins set to outputs
-	DDRD |= B01000000;
-	DDRA |= B10000000;
-	DDRC |= B00001010;
-	
-	
+  
+  pinMode(30, OUTPUT); //motor 1
+  pinMode(32, OUTPUT); //motor 2
+  pinMode(34, OUTPUT); //motor 3
+  pinMode(36, OUTPUT); //motor 4
+  
     setupMpu6050Registers();
 
     calibrateMpu6050();
 
+    delay(50000);
+
     configureChannelMapping();
 
-    // Configure interrupts for receiver
-    PCICR  |= (1 << PCIE0);  // Set PCIE0 to enable PCMSK0 scan
-    PCMSK0 |= (1 << PCINT0); // Set PCINT0 (digital input 8) to trigger an interrupt on state change
-    PCMSK0 |= (1 << PCINT1); // Set PCINT1 (digital input 9) to trigger an interrupt on state change
-    PCMSK0 |= (1 << PCINT2); // Set PCINT2 (digital input 10)to trigger an interrupt on state change
-    PCMSK0 |= (1 << PCINT3); // Set PCINT3 (digital input 11)to trigger an interrupt on state change
-
+  // set output pins so we can manually trigger their interrupts
+//  pinMode(62, OUTPUT);
+//  pinMode(63, OUTPUT);
+//  pinMode(64, OUTPUT);
+//  pinMode(65, OUTPUT);
+//  digitalWrite(62, LOW);
+//  digitalWrite(63, LOW);
+//  digitalWrite(64, LOW);
+//  digitalWrite(65, LOW);
+  
+    
+//attachInterrupt(digitalPinToInterrupt(62), myRoutine, HIGH);
+//attachInterrupt(digitalPinToInterrupt(63), myRoutine, HIGH);
+//attachInterrupt(digitalPinToInterrupt(64), myRoutine, HIGH);
+//attachInterrupt(digitalPinToInterrupt(65), myRoutine, HIGH);
+//attachInterrupt(digitalPinToInterrupt(),myRoutine, HIGH);
+    
+  
     period = (1000000/FREQ) ; // Sampling period in µs
 
     // Initialize loop_timer
     loop_timer = micros();
 
     // Turn LED off now setup is done
-    digitalWrite(13, LOW);
-<<<<<<< Updated upstream:QuadcopterMain/flight_cointroller.ino
-=======
-	
-	
->>>>>>> Stashed changes:QuadcopterMain/flight_cointroller/flight_cointroller.ino
+    //digitalWrite(13, LOW);
+  
+  
 }
 
 
 /**
  * Main program loop
  */
+//dont forget to call getdata and threshhold
 void loop() {
-<<<<<<< Updated upstream:QuadcopterMain/flight_cointroller.ino
-=======
   
-	getData();
-	showData();
-	Rxthreshholding();
-	
->>>>>>> Stashed changes:QuadcopterMain/flight_cointroller/flight_cointroller.ino
+  getData();
+  
+  if(newData)
+  {
+    pulse_length[CHANNEL1] = map(dataReceived.yaw, 0, 255, 1000, 2000);
+    pulse_length[CHANNEL2] = map(dataReceived.pitch, 0, 255, 1000, 2000);
+    pulse_length[CHANNEL3] = map(dataReceived.roll, 0, 255, 1000, 2000);
+    pulse_length[CHANNEL4] = map(dataReceived.throttle, 0, 255, 1000, 2000);
+    showData();
+    newData = false;
+  }
+ 
+
+  
     // 1. First, read raw values from MPU-6050
     readSensor();
 
@@ -232,100 +254,60 @@ void loop() {
 
     // 6. Apply motors speed
     applyMotorSpeed();
-}
 
-<<<<<<< Updated upstream:QuadcopterMain/flight_cointroller.ino
-void getData() {
-=======
-//radio functions
-void getData() {
-
->>>>>>> Stashed changes:QuadcopterMain/flight_cointroller/flight_cointroller.ino
-    if ( radio.available() ) {
-        radio.read( &dataReceived, sizeof(dataReceived) );
-        newData = true; //dont forget to set to false
-    }
-<<<<<<< Updated upstream:QuadcopterMain/flight_cointroller.ino
-=======
+    
+    
     
 }
 
-//old one, worked for angelo
-void Rxthreshholding(){
-	if(dataReceived.yaw > threshholds.yaw + 3 || dataReceived.yaw < threshholds.yaw - 3){
-		digitalWrite(62, HIGH);
-	}
-	else{
-		digitalWrite(62, LOW);	
-	}
-	
-	if(dataReceived.pitch > threshholds.pitch + 3 || dataReceived.pitch < threshholds.pitch - 3){ // add values to account for noise,unsure of val
-		digitalWrite(63, HIGH);
-	}
-	else{
-		digitalWrite(63, LOW);
-	}
-	
-	if(dataReceived.roll > threshholds.roll + 3 || dataReceived.roll < threshholds.roll - 3){ //add values to account for noise,unsure of val
-		digitalWrite(64, HIGH);
-	}
-	else{
-		digitalWrite(64, LOW);
-	}
-	
-	if(dataReceived.throttle > prev_throttle + 3 || dataReceived.throttle < prev_throttle - 3){
-		digitalWrite(65, HIGH);
-	}
-	else{
-		digitalWrite(65, LOW);	
-	}
-	
-	prev_throttle = dataReceived.throttle;
-	newData = false;
->>>>>>> Stashed changes:QuadcopterMain/flight_cointroller/flight_cointroller.ino
+//radio functions
+void getData() {
+
+    if ( radio.available() ) {
+        radio.read( &dataReceived, sizeof(dataReceived) );
+        newData = true;
+    }
+    
 }
 
-// void showData() {
-//     if (newData == true) {
-//         Serial.print("Data received ");
-//         Serial.println(dataReceived.yaw);
-//         newData = false;
-//     }
-// }
 
-<<<<<<< Updated upstream:QuadcopterMain/flight_cointroller.ino
-=======
-// void Rxthreshholding(conData dataReceived){
-// 	pulse_length[CHANNEL1] = map(dataReceived.yaw, 0, 255, 1000, 2000);
-// 	pulse_length[CHANNEL2] = map(dataReceived.pitch, 0, 255, 1000, 2000);
-// 	pulse_length[CHANNEL3] = map(dataReceived.roll, 0, 255, 1000, 2000);
-// 	pulse_length[CHANNEL4] = map(dataReceived.throttle, 0, 255, 1000, 2000);
-
-// 	newData = false;
-// }
 void showData() {
-    if (newData == true) {
-        Serial.print("Data received ");
-        Serial.print("\nYaw: " );
+        Serial.println("\n+--------------------------------------------+");
+        Serial.print("Data received \n");
+        Serial.print(" Yaw: " );
         Serial.print((int)dataReceived.yaw);
-        Serial.print("\nPitch: ");
+        Serial.print(" Pitch: ");
         Serial.print((int)dataReceived.pitch);
-        Serial.print("\nRoll: ");
+        Serial.print(" Roll: ");
         Serial.print((int)dataReceived.roll);
-        Serial.print("\nThrottle: ");
+        Serial.print(" Throttle: ");
         Serial.print((int)dataReceived.throttle);
         Serial.print("\n");
 
-        Serial.println((int)pulse_length[CHANNEL1]);
-        Serial.println((int)pulse_length[CHANNEL2]);
-        Serial.println((int)pulse_length[CHANNEL3]);
-        Serial.println((int)pulse_length[CHANNEL4]);
-        delay(3000);
-        
-    }
+        Serial.print((int)pulse_length[CHANNEL1]);
+        Serial.print(" ");
+        Serial.print((int)pulse_length[CHANNEL2]);
+        Serial.print(" ");
+        Serial.print((int)pulse_length[CHANNEL3]);
+        Serial.print(" ");
+        Serial.print((int)pulse_length[CHANNEL4]);
+        Serial.print("\n ");
+
+//     Serial.println("Angle gyro values:");
+//     Serial.print(gyro_angle[X]);
+//     Serial.print("   ");
+//     Serial.print(gyro_angle[Y]);
+//     Serial.print("   ");
+//     Serial.print(gyro_angle[Z]);
+
+
+
+        Serial.print("Started: ");
+        Serial.print(isStarted());
+        Serial.println("\n+--------------------------------------------+\n");  
+      
 }
 
->>>>>>> Stashed changes:QuadcopterMain/flight_cointroller/flight_cointroller.ino
 /**
  * Generate servo-signal on digital pins #4 #5 #6 #7 with a frequency of 250Hz (4ms period).
  * Direct port manipulation is used for performances.
@@ -341,25 +323,36 @@ void applyMotorSpeed() {
     // Update loop timer
     loop_timer = now;
 
-    // Set pins 29, 31, 33, 35 HIGH
-    PORTD |= B01000000;
-	PORTA |= B10000000;
-	PORTC |= B00001010;
-	//digitalWrite(29,HIGH);
-	//digitalWrite(31,HIGH);
-	//digitalWrite(33,HIGH);
-	//digitalWrite(35,HIGH);
-	
-    // Wait until all pins 29 31 33 35 are LOW
-    //while (PORTD == B01000000 || PORTA == B10000000 || PORTC == B00001010;) 
-	while (digitalRead(29) == 1 || digitalRead(31) == 1 || digitalRead(33) == 1 || digitalRead(35) == 1;) {
+    // Set pins 30, 32, 34, 36 HIGH
+
+REG_PIOD_SODR = 1 << 9;
+//PIOD ->  PIO_SODR = 1 << 9;
+//PIOD -> PIO_CODR = 1 << 9; //clear
+
+REG_PIOD_SODR = 1 << 10;
+//PIOD ->  PIO_SODR = 1 << 10;
+//PIOD -> PIO_CODR = 1 << 10; //clear
+
+REG_PIOC_SODR = 1 << 2;
+//PIOC ->  PIO_SODR = 1 << 2;
+//PIOC -> PIO_CODR = 1 << 2; //clear
+
+REG_PIOC_SODR = 1<< 4;
+//PIOC ->  PIO_SODR = 1 << 4;
+//PIOC -> PIO_CODR = 1 << 4; //clear
+
+
+
+    // Wait until all pins 30 32 34 36 are LOW
+
+  while ((REG_PIOD_PDSR) == 0x0000009 || (REG_PIOD_PDSR) == 0x0000000A || (REG_PIOC_PDSR) == 0x00000002 ||(REG_PIOC_PDSR) == 0x00000004) {
         now        = micros();
         difference = now - loop_timer;
 
-        if (difference >= pulse_length_esc1) PORTD &= B10111111; //digitalWrite(29,LOW); // Set pin #29 LOW
-        if (difference >= pulse_length_esc2) PORTA &= B01111111; //digitalWrite(31,LOW); // Set pin #31 LOW
-        if (difference >= pulse_length_esc3) PORTC &= B11111101; //digitalWrite(33,LOW); // Set pin #33 LOW
-        if (difference >= pulse_length_esc4) PORTC &= B11110111; //digitalWrite(35,LOW); // Set pin #35 LOW
+        if (difference >= pulse_length_esc1) REG_PIOD_CODR = 1 << 9; 
+        if (difference >= pulse_length_esc2) REG_PIOD_CODR  = 1 << 10; 
+        if (difference >= pulse_length_esc3) REG_PIOC_CODR = 1 << 2; 
+        if (difference >= pulse_length_esc4) REG_PIOC_CODR = 1 << 4; 
     }
 } 
 
@@ -394,8 +387,8 @@ void calculateAngles() {
 
     if (initialized) {
         // Correct the drift of the gyro with the accelerometer
-        gyro_angle[X] = gyro_angle[X] * 0.9996 + acc_angle[X] * 0.0004;
-        gyro_angle[Y] = gyro_angle[Y] * 0.9996 + acc_angle[Y] * 0.0004;
+        gyro_angle[X] = gyro_angle[X] * 0.9 + acc_angle[X] * 0.1;
+        gyro_angle[Y] = gyro_angle[Y] * 0.9 + acc_angle[Y] * 0.1;
     } else {
         // At very first start, init gyro angles with accelerometer angles
         resetGyroAngles();
@@ -595,21 +588,38 @@ void calibrateMpu6050() {
         gyro_offset[Z] += gyro_raw[Z];
 
         // Generate low throttle pulse to init ESC and prevent them beeping
-        //digitalWrite(29,HIGH);
-		//digitalWrite(31,HIGH);
-		//digitalWrite(33,HIGH);
-		//digitalWrite(35,HIGH);
-        PORTD |= B01000000;
-		PORTA |= B10000000;
-		PORTC |= B00001010;
-		delayMicroseconds(1000); // Wait 1000µs
-		PORTD &= B10111111;
-		PORTA &= B01111111;
-		PORTC &= B11110101;
-        //digitalWrite(29,LOW);
-		//digitalWrite(31,LOW);
-		//digitalWrite(33,LOW);
-		//digitalWrite(35,LOW);
+
+    
+REG_PIOD_SODR = 1 << 9;
+//PIOD ->  PIO_SODR = 1 << 9;
+//PIOD -> PIO_CODR = 1 << 9; //clear
+
+REG_PIOD_SODR = 1 << 10;
+//PIOD ->  PIO_SODR = 1 << 10;
+//PIOD -> PIO_CODR = 1 << 10; //clear
+
+REG_PIOC_SODR = 1 << 2;
+//PIOC ->  PIO_SODR = 1 << 2;
+//PIOC -> PIO_CODR = 1 << 2; //clear
+
+REG_PIOC_SODR = 1<< 4;
+//PIOC ->  PIO_SODR = 1 << 4;
+//PIOC -> PIO_CODR = 1 << 4; //clear
+    
+
+    delayMicroseconds(1000); // Wait 1000µs
+
+    //PIOD ->  PIO_SODR = 1 << 9;
+    REG_PIOD_CODR = 1 << 9; //clear
+    
+    //PIOD ->  PIO_SODR = 1 << 10;
+    REG_PIOD_CODR= 1 << 10; //clear
+    
+    //PIOC ->  PIO_SODR = 1 << 2;
+    REG_PIOC_CODR = 1 << 2; //clear
+    
+    //PIOC ->  PIO_SODR = 1 << 4;
+    REG_PIOC_CODR = 1 << 4; //clear
 
         // Just wait a bit before next loop
         delay(3);
@@ -619,6 +629,10 @@ void calibrateMpu6050() {
     gyro_offset[X] /= max_samples;
     gyro_offset[Y] /= max_samples;
     gyro_offset[Z] /= max_samples;
+
+//      gyro_offset[X] = 115;
+//      gyro_offset[Y] = 27;
+//      gyro_offset[Z] = 18;
 }
 
 /**
@@ -654,7 +668,7 @@ bool isStarted() {
     }
 
     // When left stick is moved back in the center position
-    if (status == STARTING && pulse_length[mode_mapping[YAW]] == 1500 && pulse_length[mode_mapping[THROTTLE]] <= 1012) {
+    if (status == STARTING && pulse_length[mode_mapping[YAW]] >= 1480 && pulse_length[mode_mapping[YAW]] <= 1520 && pulse_length[mode_mapping[THROTTLE]] <= 1012) {
         status = STARTED;
 
         // Reset PID controller's variables to prevent bump start
@@ -783,90 +797,3 @@ bool isBatteryConnected() {
 
     return battery_voltage < 1240 && battery_voltage > 800;
 }
-
-
-//old ISR
-/**
- * This Interrupt Sub Routine is called each time input 8, 9, 10 or 11 changed state.
- * Read the receiver signals in order to get flight instructions.
- *
- * This routine must be as fast as possible to prevent main program to be messed up.
- * The trick here is to use port registers to read pin state.
- * Doing (PINB & B00000001) is the same as digitalRead(8) with the advantage of using less CPU loops.
- * It is less convenient but more efficient, which is the most important here.
- *
- * @see https://www.arduino.cc/en/Reference/PortManipulation
- * @see https://www.firediy.fr/article/utiliser-sa-radiocommande-avec-un-arduino-drone-ch-6
- */
-// ISR(PCINT0_vect) {
-//         current_time = micros();
-
-//         // Channel 1 -------------------------------------------------
-//         if (PINB & B00000001) {                                        // Is input 8 high ?
-//             if (previous_state[CHANNEL1] == LOW) {                     // Input 8 changed from 0 to 1 (rising edge)
-//                 previous_state[CHANNEL1] = HIGH;                       // Save current state
-//                 timer[CHANNEL1] = current_time;                        // Save current time
-//             }
-//         } else if (previous_state[CHANNEL1] == HIGH) {                 // Input 8 changed from 1 to 0 (falling edge)
-//             previous_state[CHANNEL1] = LOW;                            // Save current state
-//             pulse_length[CHANNEL1] = current_time - timer[CHANNEL1];   // Calculate pulse duration & save it
-//         }
-
-//         // Channel 2 -------------------------------------------------
-//         if (PINB & B00000010) {                                        // Is input 9 high ?
-//             if (previous_state[CHANNEL2] == LOW) {                     // Input 9 changed from 0 to 1 (rising edge)
-//                 previous_state[CHANNEL2] = HIGH;                       // Save current state
-//                 timer[CHANNEL2] = current_time;                        // Save current time
-//             }
-//         } else if (previous_state[CHANNEL2] == HIGH) {                 // Input 9 changed from 1 to 0 (falling edge)
-//             previous_state[CHANNEL2] = LOW;                            // Save current state
-//             pulse_length[CHANNEL2] = current_time - timer[CHANNEL2];   // Calculate pulse duration & save it
-//         }
-
-//         // Channel 3 -------------------------------------------------
-//         if (PINB & B00000100) {                                        // Is input 10 high ?
-//             if (previous_state[CHANNEL3] == LOW) {                     // Input 10 changed from 0 to 1 (rising edge)
-//                 previous_state[CHANNEL3] = HIGH;                       // Save current state
-//                 timer[CHANNEL3] = current_time;                        // Save current time
-//             }
-//         } else if (previous_state[CHANNEL3] == HIGH) {                 // Input 10 changed from 1 to 0 (falling edge)
-//             previous_state[CHANNEL3] = LOW;                            // Save current state
-//             pulse_length[CHANNEL3] = current_time - timer[CHANNEL3];   // Calculate pulse duration & save it
-//         }
-
-//         // Channel 4 -------------------------------------------------
-//         if (PINB & B00001000) {                                        // Is input 11 high ?
-//             if (previous_state[CHANNEL4] == LOW) {                     // Input 11 changed from 0 to 1 (rising edge)
-//                 previous_state[CHANNEL4] = HIGH;                       // Save current state
-//                 timer[CHANNEL4] = current_time;                        // Save current time
-//             }
-//         } else if (previous_state[CHANNEL4] == HIGH) {                 // Input 11 changed from 1 to 0 (falling edge)
-//             previous_state[CHANNEL4] = LOW;                            // Save current state
-//             pulse_length[CHANNEL4] = current_time - timer[CHANNEL4];   // Calculate pulse duration & save it
-//         }
-// }
-<<<<<<< Updated upstream:QuadcopterMain/flight_cointroller.ino
-=======
-void myRoutine() {
-
-        // Channel 1 -------------------------------------------------
-        if (digitalRead(62)) {    
-		pulse_length[CHANNEL1] = map((volatile unsigned int)dataReceived.yaw, 0, 255, 1000, 2000);
-	}
-
-        // Channel 2 -------------------------------------------------
-        if (digitalRead(63)) {
-		pulse_length[CHANNEL2] = map((volatile unsigned int)dataReceived.pitch, 0, 255, 1000, 2000);
-	}
-
-        // Channel 3 -------------------------------------------------
-        if (digitalRead(64)) {
-		pulse_length[CHANNEL3] = map((volatile unsigned int)dataReceived.roll, 0, 255, 1000, 2000);
-	}
-
-        // Channel 4 -------------------------------------------------
-        if (digitalRead(65)) {
-		pulse_length[CHANNEL4] = map((volatile unsigned int)dataReceived.throttle, 0, 255, 1000, 2000);
-        }
-}
->>>>>>> Stashed changes:QuadcopterMain/flight_cointroller/flight_cointroller.ino
