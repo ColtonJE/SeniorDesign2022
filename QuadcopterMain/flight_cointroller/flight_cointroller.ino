@@ -1,5 +1,5 @@
 //things to try
-//-remove battery drop compensate, could be affecting esc pulse width because our battery is different
+//-remove battery drop compensate, could be affecting esc pulse width because our battery is different DONE
 //-check esc orientation 1-4
 //-verify mpu6050 configurations are correct DONE
 //-setting gyro offsets initially (i have a pic)
