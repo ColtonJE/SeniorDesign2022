@@ -1,3 +1,9 @@
+//things to try
+//-remove battery drop compensate, could be affecting esc pulse width because our battery is different
+//-check esc orientation 1-4
+//-verify mpu6050 configurations are correct DONE
+//-setting gyro offsets initially (i have a pic)
+//
 
 #include <Wire.h>
 
@@ -46,12 +52,6 @@ bool newData = false;
 #define STOPPED  0
 #define STARTING 1
 #define STARTED  2
-
-//Rx threshhold values, not sure exactly what they need to be yet
-volatile byte prev_yaw = 127;
-volatile byte prev_pitch = 127;
-volatile byte prev_roll = 127;
-volatile byte prev_throttle = 127;
 
 // ---------------- Receiver variables ---------------------------------------
 // Previous state of each channel (HIGH or LOW)
@@ -162,9 +162,7 @@ void setup() {
     radio.openReadingPipe(1, thisSlaveAddress);
     radio.startListening();
   
-    // Turn LED on during setup
-    //pinMode(13, OUTPUT);
-    //digitalWrite(13, HIGH);
+    
 
     //esc output pins set to outputs
   
@@ -185,8 +183,7 @@ void setup() {
     // Initialize loop_timer
     loop_timer = micros();
 
-    // Turn LED off now setup is done
-    //digitalWrite(13, LOW);
+    
   
   
 }
