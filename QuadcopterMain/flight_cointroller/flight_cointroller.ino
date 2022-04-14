@@ -1,10 +1,10 @@
 //things to try
 //-remove battery drop compensate, could be affecting esc pulse width because our battery is different DONE
-//-check esc orientation 1-4
+//-check esc orientation 1-4 DONE
 //-verify mpu6050 configurations are correct DONE
-//-setting gyro offsets initially (i have a pic)
-//-edit filters used in calculations 
-//-set the struct = to another struct instance for a placeholder each time
+//-setting gyro offsets initially (i have a pic) DONE
+//-edit filters used in calculations DONE
+//-set the struct = to another struct instance for a placeholder each time done
 
 #include <Wire.h>
 
