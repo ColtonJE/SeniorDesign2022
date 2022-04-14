@@ -3,7 +3,7 @@
 //-check esc orientation 1-4
 //-verify mpu6050 configurations are correct DONE
 //-setting gyro offsets initially (i have a pic)
-//
+//-edit filters used in calculations 
 
 #include <Wire.h>
 
