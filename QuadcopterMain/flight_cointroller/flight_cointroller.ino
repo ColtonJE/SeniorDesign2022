@@ -178,23 +178,6 @@ void setup() {
     calibrateMpu6050();
 
     configureChannelMapping();
-
-  // set output pins so we can manually trigger their interrupts
-//  pinMode(62, OUTPUT);
-//  pinMode(63, OUTPUT);
-//  pinMode(64, OUTPUT);
-//  pinMode(65, OUTPUT);
-//  digitalWrite(62, LOW);
-//  digitalWrite(63, LOW);
-//  digitalWrite(64, LOW);
-//  digitalWrite(65, LOW);
-  
-    
-//attachInterrupt(digitalPinToInterrupt(62), myRoutine, HIGH);
-//attachInterrupt(digitalPinToInterrupt(63), myRoutine, HIGH);
-//attachInterrupt(digitalPinToInterrupt(64), myRoutine, HIGH);
-//attachInterrupt(digitalPinToInterrupt(65), myRoutine, HIGH);
-//attachInterrupt(digitalPinToInterrupt(),myRoutine, HIGH);
     
   
     period = (1000000/FREQ) ; // Sampling period in µs
@@ -212,7 +195,6 @@ void setup() {
 /**
  * Main program loop
  */
-//dont forget to call getdata and threshhold
 void loop() {
   
   getData();
