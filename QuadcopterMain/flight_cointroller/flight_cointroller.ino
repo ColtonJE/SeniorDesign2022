@@ -4,6 +4,7 @@
 //-verify mpu6050 configurations are correct DONE
 //-setting gyro offsets initially (i have a pic)
 //-edit filters used in calculations 
+//-set the struct = to another struct instance for a placeholder each time
 
 #include <Wire.h>
 
