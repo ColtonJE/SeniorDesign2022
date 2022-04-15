@@ -128,10 +128,14 @@ float previous_error[3] = {0, 0, 0}; // Last errors (used for derivative compone
 //float Ki[3] = {0.02, 0.04, 0.04}; // I coefficients in that order : Yaw, Pitch, Roll
 //float Kd[3] = {0, 18, 18};        // D coefficients in that order : Yaw, Pitch, Roll
 
-float Kp[3] = {0, 0, 0};    // P coefficients in that order : Yaw, Pitch, Roll
-float Ki[3] = {0, 0, 0}; // I coefficients in that order : Yaw, Pitch, Roll
-float Kd[3] = {0, 0, 0};        // D coefficients in that order : Yaw, Pitch, Roll
+//float Kp[3] = {3.2, 0.2, 0.2};    // P coefficients in that order : Yaw, Pitch, Roll
+//float Ki[3] = {0.02, 0, 0}; // I coefficients in that order : Yaw, Pitch, Roll
+//float Kd[3] = {0, 4, 4};        // D coefficients in that order : Yaw, Pitch, Roll
 
+
+float Kp[3] = {4.0, 1.4, 1.4};    // P coefficients in that order : Yaw, Pitch, Roll
+float Ki[3] = {0.02, 0.03, 0.03}; // I coefficients in that order : Yaw, Pitch, Roll
+float Kd[3] = {0, 15, 15};        // D coefficients in that order : Yaw, Pitch, Roll
 
 // ---------------------------------------------------------------------------
 /**
@@ -377,8 +381,8 @@ void calculateAngles() {
 
     if (initialized) {
         // Correct the drift of the gyro with the accelerometer
-        gyro_angle[X] = gyro_angle[X] * 0.9 + acc_angle[X] * 0.1;
-        gyro_angle[Y] = gyro_angle[Y] * 0.9 + acc_angle[Y] * 0.1;
+        gyro_angle[X] = gyro_angle[X] * 0.9996 + acc_angle[X] * 0.0004;
+        gyro_angle[Y] = gyro_angle[Y] * 0.9996 + acc_angle[Y] * 0.0004;
     } else {
         // At very first start, init gyro angles with accelerometer angles
         resetGyroAngles();
@@ -568,44 +572,46 @@ void setupMpu6050Registers() {
  * This function might take ~2sec for 2000 samples.
  */
 void calibrateMpu6050() {
-    int max_samples = 2000;
+//    int max_samples = 2000;
+//
+//    for (int i = 0; i < max_samples; i++) {
+//        readSensor();
+//
+//        gyro_offset[X] += gyro_raw[X];
+//        gyro_offset[Y] += gyro_raw[Y];
+//        gyro_offset[Z] += gyro_raw[Z];
+//
+//        // Generate low throttle pulse to init ESC and prevent them beeping
+//        digitalWrite(30,HIGH);
+//  digitalWrite(32,HIGH);
+//  digitalWrite(34,HIGH);
+//  digitalWrite(36,HIGH);
+//        //PORTD |= B01000000;
+//    //PORTA |= B10000000;
+//    //PORTC |= B00001010;
+//    delayMicroseconds(1000); // Wait 1000µs
+//    //PORTD &= B10111111;
+//    //PORTA &= B01111111;
+//    //PORTC &= B11110101;
+//        digitalWrite(30,LOW);
+//  digitalWrite(32,LOW);
+//  digitalWrite(34,LOW);
+//  digitalWrite(36,LOW);
+//
+//        // Just wait a bit before next loop
+//        delay(3);
+//    }
+//
+//    // Calculate average offsets
+//    gyro_offset[X] /= max_samples;
+//    gyro_offset[Y] /= max_samples;
+//    gyro_offset[Z] /= max_samples;
 
-    for (int i = 0; i < max_samples; i++) {
-        readSensor();
+      gyro_offset[X] = 115;
+      gyro_offset[Y] = 27;
+      gyro_offset[Z] = 18;
 
-        gyro_offset[X] += gyro_raw[X];
-        gyro_offset[Y] += gyro_raw[Y];
-        gyro_offset[Z] += gyro_raw[Z];
-
-        // Generate low throttle pulse to init ESC and prevent them beeping
-        digitalWrite(30,HIGH);
-  digitalWrite(32,HIGH);
-  digitalWrite(34,HIGH);
-  digitalWrite(36,HIGH);
-        //PORTD |= B01000000;
-    //PORTA |= B10000000;
-    //PORTC |= B00001010;
-    delayMicroseconds(1000); // Wait 1000µs
-    //PORTD &= B10111111;
-    //PORTA &= B01111111;
-    //PORTC &= B11110101;
-        digitalWrite(30,LOW);
-  digitalWrite(32,LOW);
-  digitalWrite(34,LOW);
-  digitalWrite(36,LOW);
-
-        // Just wait a bit before next loop
-        delay(3);
-    }
-
-    // Calculate average offsets
-    gyro_offset[X] /= max_samples;
-    gyro_offset[Y] /= max_samples;
-    gyro_offset[Z] /= max_samples;
-
-//      gyro_offset[X] = 115;
-//      gyro_offset[Y] = 27;
-//      gyro_offset[Z] = 18;
+      delay(500);
 }
 
 /**
