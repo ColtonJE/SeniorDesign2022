@@ -1,4 +1,9 @@
 
+//print out esc pulse width before the minMax function is called to see whats really the value
+//otherwise, find error in:
+//PID controller
+//PID coefficients
+//gyroscope/accel
 #include <Wire.h>
 
 //Rx libraries
@@ -133,9 +138,13 @@ float previous_error[3] = {0, 0, 0}; // Last errors (used for derivative compone
 //float Kd[3] = {0, 4, 4};        // D coefficients in that order : Yaw, Pitch, Roll
 
 
-float Kp[3] = {4.0, 1.4, 1.4};    // P coefficients in that order : Yaw, Pitch, Roll
-float Ki[3] = {0.02, 0.03, 0.03}; // I coefficients in that order : Yaw, Pitch, Roll
-float Kd[3] = {0, 15, 15};        // D coefficients in that order : Yaw, Pitch, Roll
+//float Kp[3] = {4.0, 1.4, 1.4};    // P coefficients in that order : Yaw, Pitch, Roll
+//float Ki[3] = {0.02, 0.03, 0.03}; // I coefficients in that order : Yaw, Pitch, Roll
+//float Kd[3] = {0, 15, 15};        // D coefficients in that order : Yaw, Pitch, Roll
+
+float Kp[3] = {0,0,0};    // P coefficients in that order : Yaw, Pitch, Roll
+float Ki[3] = {0,0,0}; // I coefficients in that order : Yaw, Pitch, Roll
+float Kd[3] = {0,0,0};        // D coefficients in that order : Yaw, Pitch, Roll
 
 // ---------------------------------------------------------------------------
 /**
@@ -170,9 +179,7 @@ void setup() {
     radio.openReadingPipe(1, thisSlaveAddress);
     radio.startListening();
   
-    // Turn LED on during setup
-    //pinMode(13, OUTPUT);
-    //digitalWrite(13, HIGH);
+   
 
     //esc output pins set to outputs
   
@@ -186,23 +193,6 @@ void setup() {
     calibrateMpu6050();
 
     configureChannelMapping();
-
-  // set output pins so we can manually trigger their interrupts
-//  pinMode(62, OUTPUT);
-//  pinMode(63, OUTPUT);
-//  pinMode(64, OUTPUT);
-//  pinMode(65, OUTPUT);
-//  digitalWrite(62, LOW);
-//  digitalWrite(63, LOW);
-//  digitalWrite(64, LOW);
-//  digitalWrite(65, LOW);
-  
-    
-//attachInterrupt(digitalPinToInterrupt(62), myRoutine, HIGH);
-//attachInterrupt(digitalPinToInterrupt(63), myRoutine, HIGH);
-//attachInterrupt(digitalPinToInterrupt(64), myRoutine, HIGH);
-//attachInterrupt(digitalPinToInterrupt(65), myRoutine, HIGH);
-//attachInterrupt(digitalPinToInterrupt(),myRoutine, HIGH);
     
   
     period = (1000000/FREQ) ; // Sampling period in µs
@@ -210,10 +200,7 @@ void setup() {
     // Initialize loop_timer
     loop_timer = micros();
 
-    // Turn LED off now setup is done
-    //digitalWrite(13, LOW);
   
-
 }
 
 
@@ -236,7 +223,6 @@ void loop() {
     showData();
     newData = false;
   }
- 
 
   
     // 1. First, read raw values from MPU-6050
@@ -255,7 +241,7 @@ void loop() {
         // 5. Calculate motors speed with PID controller
         pidController();
 
-        compensateBatteryDrop();
+        //compensateBatteryDrop();
     }
 
     // 6. Apply motors speed
@@ -292,19 +278,31 @@ void showData() {
 
         Serial.print((int)pulse_length[CHANNEL1]);
         Serial.print(" ");
-     Serial.print((int)pulse_length[CHANNEL2]);
-     Serial.print(" ");
-     Serial.print((int)pulse_length[CHANNEL3]);
-     Serial.print(" ");
-     Serial.print((int)pulse_length[CHANNEL4]);
-     Serial.print("\n ");
+        Serial.print((int)pulse_length[CHANNEL2]);
+        Serial.print(" ");
+        Serial.print((int)pulse_length[CHANNEL3]);
+        Serial.print(" ");
+        Serial.print((int)pulse_length[CHANNEL4]);
+        Serial.print("\n ");
 
-//     Serial.println("Angle gyro values:");
-//     Serial.print(gyro_angle[X]);
+//     //Serial.println("Angle gyro values:");
+//     Serial.print(measures[YAW]);
 //     Serial.print("   ");
-//     Serial.print(gyro_angle[Y]);
+//     Serial.print(measures[PITCH]);
 //     Serial.print("   ");
-//     Serial.print(gyro_angle[Z]);
+//     Serial.print(measures[ROLL]);
+//     Serial.print("\n");
+
+//       Serial.print(pulse_length_esc1);
+//       Serial.print("   ");
+//       Serial.print(pulse_length_esc2);
+//       Serial.print("   ");
+//       Serial.print(pulse_length_esc3);
+//       Serial.print("   ");
+//       Serial.print(pulse_length_esc4);
+//       Serial.print("\n");
+
+    
 
 
 
