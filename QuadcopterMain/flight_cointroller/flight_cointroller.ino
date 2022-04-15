@@ -6,10 +6,8 @@
 //#include <nRF24L01.h>
 #include <RF24.h>
 
-
 #define CE_PIN   25
 #define CSN_PIN 23
-
 
 const byte thisSlaveAddress[5] = {'R','x','A','A','A'};
 
@@ -23,8 +21,8 @@ typedef struct {
   byte throttle;
 }conData;
 
-conData threshholds = {127,127,127,0};
 conData dataReceived = {0,0,0,0}; // this must match dataToSend in the TX
+
 bool newData = false;
 
 // ------------------- Define some constants for convenience -----------------
@@ -126,9 +124,13 @@ float delta_err[3]      = {0, 0, 0}; // Error deltas in that order   : Yaw, Pitc
 float error_sum[3]      = {0, 0, 0}; // Error sums (used for integral component) : [Yaw, Pitch, Roll]
 float previous_error[3] = {0, 0, 0}; // Last errors (used for derivative component) : [Yaw, Pitch, Roll]
 // PID coefficients
-float Kp[3] = {4.0, 1.3, 1.3};    // P coefficients in that order : Yaw, Pitch, Roll
-float Ki[3] = {0.02, 0.04, 0.04}; // I coefficients in that order : Yaw, Pitch, Roll
-float Kd[3] = {0, 18, 18};        // D coefficients in that order : Yaw, Pitch, Roll
+//float Kp[3] = {4.0, 1.3, 1.3};    // P coefficients in that order : Yaw, Pitch, Roll
+//float Ki[3] = {0.02, 0.04, 0.04}; // I coefficients in that order : Yaw, Pitch, Roll
+//float Kd[3] = {0, 18, 18};        // D coefficients in that order : Yaw, Pitch, Roll
+
+float Kp[3] = {0, 0, 0};    // P coefficients in that order : Yaw, Pitch, Roll
+float Ki[3] = {0, 0, 0}; // I coefficients in that order : Yaw, Pitch, Roll
+float Kd[3] = {0, 0, 0};        // D coefficients in that order : Yaw, Pitch, Roll
 
 
 // ---------------------------------------------------------------------------
@@ -170,19 +172,33 @@ void setup() {
 
     //esc output pins set to outputs
   
-  pinMode(30, OUTPUT); //motor 1
-  pinMode(32, OUTPUT); //motor 2
-  pinMode(34, OUTPUT); //motor 3
-  pinMode(36, OUTPUT); //motor 4
+  pinMode(30, OUTPUT);
+  pinMode(32, OUTPUT);
+  pinMode(34, OUTPUT);
+  pinMode(36, OUTPUT);
   
     setupMpu6050Registers();
 
     calibrateMpu6050();
 
-   // delay(50000);
-
     configureChannelMapping();
 
+  // set output pins so we can manually trigger their interrupts
+//  pinMode(62, OUTPUT);
+//  pinMode(63, OUTPUT);
+//  pinMode(64, OUTPUT);
+//  pinMode(65, OUTPUT);
+//  digitalWrite(62, LOW);
+//  digitalWrite(63, LOW);
+//  digitalWrite(64, LOW);
+//  digitalWrite(65, LOW);
+  
+    
+//attachInterrupt(digitalPinToInterrupt(62), myRoutine, HIGH);
+//attachInterrupt(digitalPinToInterrupt(63), myRoutine, HIGH);
+//attachInterrupt(digitalPinToInterrupt(64), myRoutine, HIGH);
+//attachInterrupt(digitalPinToInterrupt(65), myRoutine, HIGH);
+//attachInterrupt(digitalPinToInterrupt(),myRoutine, HIGH);
     
   
     period = (1000000/FREQ) ; // Sampling period in µs
@@ -193,7 +209,7 @@ void setup() {
     // Turn LED off now setup is done
     //digitalWrite(13, LOW);
   
-  
+
 }
 
 
@@ -203,14 +219,16 @@ void setup() {
 //dont forget to call getdata and threshhold
 void loop() {
   
-  getData();
   
+  getData();
+
   if(newData)
   {
     pulse_length[CHANNEL1] = map(dataReceived.yaw, 0, 255, 1000, 2000);
     pulse_length[CHANNEL2] = map(dataReceived.pitch, 0, 255, 1000, 2000);
     pulse_length[CHANNEL3] = map(dataReceived.roll, 0, 255, 1000, 2000);
     pulse_length[CHANNEL4] = map(dataReceived.throttle, 0, 255, 1000, 2000);
+
     showData();
     newData = false;
   }
@@ -270,12 +288,12 @@ void showData() {
 
         Serial.print((int)pulse_length[CHANNEL1]);
         Serial.print(" ");
-        Serial.print((int)pulse_length[CHANNEL2]);
-        Serial.print(" ");
-        Serial.print((int)pulse_length[CHANNEL3]);
-        Serial.print(" ");
-        Serial.print((int)pulse_length[CHANNEL4]);
-        Serial.print("\n ");
+     Serial.print((int)pulse_length[CHANNEL2]);
+     Serial.print(" ");
+     Serial.print((int)pulse_length[CHANNEL3]);
+     Serial.print(" ");
+     Serial.print((int)pulse_length[CHANNEL4]);
+     Serial.print("\n ");
 
 //     Serial.println("Angle gyro values:");
 //     Serial.print(gyro_angle[X]);
@@ -286,9 +304,9 @@ void showData() {
 
 
 
-        Serial.print("Started: ");
-        Serial.print(isStarted());
-        Serial.println("\n+--------------------------------------------+\n");  
+     Serial.print("Started: ");
+     Serial.print(isStarted());
+     Serial.println("\n+--------------------------------------------+\n");  
       
 }
 
@@ -309,38 +327,23 @@ void applyMotorSpeed() {
 
     // Set pins 30, 32, 34, 36 HIGH
 
-//REG_PIOD_SODR = 1 << 9;
-//PIOD ->  PIO_SODR = 1 << 9;
-//PIOD -> PIO_CODR = 1 << 9; //clear
-
-//REG_PIOD_SODR = 1 << 10;
-//PIOD ->  PIO_SODR = 1 << 10;
-//PIOD -> PIO_CODR = 1 << 10; //clear
-
-//REG_PIOC_SODR = 1 << 2;
-//PIOC ->  PIO_SODR = 1 << 2;
-//PIOC -> PIO_CODR = 1 << 2; //clear
-
-//REG_PIOC_SODR = 1<< 4;
-//PIOC ->  PIO_SODR = 1 << 4;
-//PIOC -> PIO_CODR = 1 << 4; //clear
+  digitalWrite(30,HIGH);
+  digitalWrite(32,HIGH);
+  digitalWrite(34,HIGH);
+  digitalWrite(36,HIGH);
   
-PIOD ->  PIO_SODR = 0x3 << 9;
-PIOC ->  PIO_SODR = 0x5 << 2;
-
-
-
     // Wait until all pins 30 32 34 36 are LOW
-//REG_PIOD_PDSR == 0b00000000000000000000011000000000 || REG_PIOD_PDSR == 0b00000000000000000000010000000000 || REG_PIOD_PDSR == 0b00000000000000000000001000000000 || REG_PIOC_PDSR == 0b00000000000000000000000000010100 || REG_PIOC_PDSR == 0b00000000000000000000000000010000 || REG_PIOC_PDSR == 0b00000000000000000000000000000100)
-  while (digitalRead(30) || digitalRead(32) || digitalRead(34) || digitalRead(36)) {
+
+  while (digitalRead(30) == 1 || digitalRead(32) == 1 || digitalRead(34) == 1 || digitalRead(36) == 1) {
         now        = micros();
         difference = now - loop_timer;
 
-        if (difference >= pulse_length_esc1) REG_PIOD_CODR = 0b00000000000000000000001000000000; 
-        if (difference >= pulse_length_esc2) REG_PIOD_CODR = 0b00000000000000000000010000000000; 
-        if (difference >= pulse_length_esc3) REG_PIOC_CODR = 0b00000000000000000000000000000100; 
-        if (difference >= pulse_length_esc4) REG_PIOC_CODR = 0b00000000000000000000000000010000; 
+        if (difference >= pulse_length_esc1+100) digitalWrite(30,LOW); 
+        if (difference >= pulse_length_esc2-50) digitalWrite(32,LOW); 
+        if (difference >= pulse_length_esc3+175) digitalWrite(34,LOW); 
+        if (difference >= pulse_length_esc4-25) digitalWrite(36,LOW); 
     }
+
 } 
 
 
@@ -575,43 +578,21 @@ void calibrateMpu6050() {
         gyro_offset[Z] += gyro_raw[Z];
 
         // Generate low throttle pulse to init ESC and prevent them beeping
-
-    
-//REG_PIOD_SODR = 1 << 9;
-//PIOD ->  PIO_SODR = 1 << 9;
-//PIOD -> PIO_CODR = 1 << 9; //clear
-
-//REG_PIOD_SODR = 1 << 10;
-//PIOD ->  PIO_SODR = 1 << 10;
-//PIOD -> PIO_CODR = 1 << 10; //clear
-
-//REG_PIOC_SODR = 1 << 2;
-//PIOC ->  PIO_SODR = 1 << 2;
-//PIOC -> PIO_CODR = 1 << 2; //clear
-
-//REG_PIOC_SODR = 1<< 4;
-//PIOC ->  PIO_SODR = 1 << 4;
-//PIOC -> PIO_CODR = 1 << 4; //clear
-      
-    PIOD ->  PIO_SODR = 0x3 << 9;
-    PIOC ->  PIO_SODR = 0x5 << 2;
-
+        digitalWrite(30,HIGH);
+  digitalWrite(32,HIGH);
+  digitalWrite(34,HIGH);
+  digitalWrite(36,HIGH);
+        //PORTD |= B01000000;
+    //PORTA |= B10000000;
+    //PORTC |= B00001010;
     delayMicroseconds(1000); // Wait 1000µs
-
-    PIOD ->  PIO_CODR = 0x3 << 9;
-    PIOC ->  PIO_CODR = 0x5 << 2;
-      
-    //PIOD ->  PIO_SODR = 1 << 9;
-    //REG_PIOD_CODR = 1 << 9; //clear
-    
-    //PIOD ->  PIO_SODR = 1 << 10;
-    //REG_PIOD_CODR= 1 << 10; //clear
-    
-    //PIOC ->  PIO_SODR = 1 << 2;
-    //REG_PIOC_CODR = 1 << 2; //clear
-    
-    //PIOC ->  PIO_SODR = 1 << 4;
-    //REG_PIOC_CODR = 1 << 4; //clear
+    //PORTD &= B10111111;
+    //PORTA &= B01111111;
+    //PORTC &= B11110101;
+        digitalWrite(30,LOW);
+  digitalWrite(32,LOW);
+  digitalWrite(34,LOW);
+  digitalWrite(36,LOW);
 
         // Just wait a bit before next loop
         delay(3);
