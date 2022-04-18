@@ -7,8 +7,8 @@
 //=================================================
 
 //Radio ===========================================
-#define CE_PIN   9
-#define CSN_PIN 10
+#define CE_PIN   25
+#define CSN_PIN 23
 
 const byte thisSlaveAddress[5] = {'R','x','A','A','A'};
 
@@ -20,17 +20,27 @@ typedef struct {
   byte roll;
   byte throttle;
 }conData;
+typedef struct {
+  int yaw;
+  int pitch;
+  int roll;
+  int throttle;
+}Data;
+
+int M1, M2, M3, M4 = 0;
 
 conData dataReceived; // this must match dataToSend in the TX
+Data mapped;
+Data x;
 bool newData = false;
 //===================================================
 
 //Servo =============================================
 //Values for ESC pins
-byte escFL = 35;
-byte escFR = 33;
-byte escBL = 31;
-byte escBR = 29;
+byte escFL = 30;
+byte escFR = 32;
+byte escBL = 34;
+byte escBR = 36;
 // Initialize ESCs (Done as Servos to facilitate PWM signals)
 Servo ESC_FL;
 Servo ESC_FR;
@@ -60,22 +70,14 @@ void setup() {
   ESC_FL.writeMicroseconds(1000);
   ESC_BR.writeMicroseconds(1000);
   ESC_BL.writeMicroseconds(1000);
+
+  delay(5000);
   //================================================
 }
 
 //=============
 
 void loop() {
-<<<<<<< Updated upstream
-    getData();
-    showData();
-    if(newData){
-      ESC_FR.writeMicroseconds(map(dataReceived, 215, 255, 1000, 2000));
-      ESC_FL.writeMicroseconds(1000);
-      ESC_BR.writeMicroseconds(1000);
-      ESC_BL.writeMicroseconds(1000);
-    }
-=======
   
   getData();
 //  showData();
@@ -84,7 +86,17 @@ void loop() {
   M3 = mapped.throttle + mapped.yaw + mapped.pitch + mapped.roll;
   M4 = mapped.throttle + mapped.yaw + mapped.pitch - mapped.roll;
 
-  Serial.print("After: ");
+//  Serial.print("After: ");
+//  Serial.print(1000 + minMax(M1,100,1000));
+//  Serial.print(" ");
+//  Serial.print(1000 + minMax(M2,100,1000));
+//  Serial.print(" ");
+//  Serial.print(1000 + minMax(M3,100,1000));
+//  Serial.print(" ");
+//  Serial.print(1000 + minMax(M4,100,1000));
+//  Serial.print("\n");
+
+Serial.print("After: ");
   Serial.print(M1);
   Serial.print(" ");
   Serial.print(M2);
@@ -100,7 +112,6 @@ void loop() {
   ESC_BL.writeMicroseconds(1000 + minMax(M1,100,1000)+200);
 
 //  Serial.println( 
->>>>>>> Stashed changes
 }
 
 //==============
@@ -109,8 +120,6 @@ void getData() {
     if ( radio.available() ) {
         radio.read( &dataReceived, sizeof(dataReceived) );
         newData = true;
-<<<<<<< Updated upstream
-=======
         mapped.yaw = map( dataReceived.yaw, 0, 255, -100, 100 );
         mapped.pitch = map( dataReceived.pitch, 0, 255, -100, 100 );
         mapped.roll = map( dataReceived.roll, 0, 255, -100, 100 );
@@ -121,7 +130,6 @@ void getData() {
 //        Serial.print(mapped.roll);
 //        Serial.print(mapped.throttle);
 //        Serial.print("\n");
->>>>>>> Stashed changes
     }
 }
 
@@ -139,4 +147,14 @@ void showData() {
         Serial.print("\n");
         newData = false;
     }
+}
+
+int minMax(int value, int min_value, int max_value) {
+    if (value > max_value) {
+        value = max_value;
+    } else if (value < min_value) {
+        value = min_value;
+    }
+
+    return value;
 }
