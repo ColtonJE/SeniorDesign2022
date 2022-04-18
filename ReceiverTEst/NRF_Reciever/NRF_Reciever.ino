@@ -14,17 +14,23 @@ const byte thisSlaveAddress[5] = {'R','x','A','A','A'};
 
 RF24 radio(CE_PIN, CSN_PIN);
 
+bool started = false;
+
 typedef struct {
   byte yaw;
   byte pitch;
   byte roll;
   byte throttle;
+  bool button_left;
+  bool button_right;
 }conData;
 typedef struct {
   int yaw;
   int pitch;
   int roll;
   int throttle;
+  bool button_left;
+  bool button_right;
 }Data;
 
 int M1, M2, M3, M4 = 0;
@@ -58,7 +64,7 @@ void setup() {
   radio.openReadingPipe(1, thisSlaveAddress);
   radio.startListening();
   //================================================
-
+  
   //Servo Setup ====================================
   // Attach Servos to corresponding Pins
   ESC_FL.attach(escFL);
@@ -78,9 +84,14 @@ void setup() {
 //=============
 
 void loop() {
-  
+
   getData();
+  STARTSTOP();
+  if(started == true)
+  {
+  
 //  showData();
+  
   M1 = mapped.throttle + mapped.yaw - mapped.pitch + mapped.roll;
   M2 = mapped.throttle + mapped.yaw - mapped.pitch - mapped.roll;
   M3 = mapped.throttle + mapped.yaw + mapped.pitch + mapped.roll;
@@ -110,6 +121,19 @@ Serial.print("After: ");
   ESC_FL.writeMicroseconds(1000 + minMax(M1,100,1000)+100);
   ESC_BR.writeMicroseconds(1000 + minMax(M1,100,1000));
   ESC_BL.writeMicroseconds(1000 + minMax(M1,100,1000)+200);
+  }
+  else
+  {
+    while(started == false)
+    {
+    ESC_FR.writeMicroseconds(1000);
+    ESC_FL.writeMicroseconds(1000);
+    ESC_BR.writeMicroseconds(1000);
+    ESC_BL.writeMicroseconds(1000);
+    getData();
+    STARTSTOP();
+    }
+  }
 
 //  Serial.println( 
 }
@@ -145,7 +169,20 @@ void showData() {
         Serial.print("\nThrottle: ");
         Serial.print((int)dataReceived.throttle);
         Serial.print("\n");
+        
         newData = false;
+    }
+}
+
+void STARTSTOP()
+{
+    if(dataReceived.button_left == 0 && started == false)
+    {
+       started = true;
+    }
+    else if (dataReceived.button_right == 0 && started == true)
+    {
+       started = false;
     }
 }
 
