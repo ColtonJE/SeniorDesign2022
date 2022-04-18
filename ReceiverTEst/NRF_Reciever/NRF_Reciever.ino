@@ -66,6 +66,7 @@ void setup() {
 //=============
 
 void loop() {
+<<<<<<< Updated upstream
     getData();
     showData();
     if(newData){
@@ -74,6 +75,32 @@ void loop() {
       ESC_BR.writeMicroseconds(1000);
       ESC_BL.writeMicroseconds(1000);
     }
+=======
+  
+  getData();
+//  showData();
+  M1 = mapped.throttle + mapped.yaw - mapped.pitch + mapped.roll;
+  M2 = mapped.throttle + mapped.yaw - mapped.pitch - mapped.roll;
+  M3 = mapped.throttle + mapped.yaw + mapped.pitch + mapped.roll;
+  M4 = mapped.throttle + mapped.yaw + mapped.pitch - mapped.roll;
+
+  Serial.print("After: ");
+  Serial.print(M1);
+  Serial.print(" ");
+  Serial.print(M2);
+  Serial.print(" ");
+  Serial.print(M3);
+  Serial.print(" ");
+  Serial.print(M4);
+  Serial.print("\n");
+  
+  ESC_FR.writeMicroseconds(1000 + minMax(M1,100,1000));
+  ESC_FL.writeMicroseconds(1000 + minMax(M1,100,1000)+100);
+  ESC_BR.writeMicroseconds(1000 + minMax(M1,100,1000));
+  ESC_BL.writeMicroseconds(1000 + minMax(M1,100,1000)+200);
+
+//  Serial.println( 
+>>>>>>> Stashed changes
 }
 
 //==============
@@ -82,6 +109,19 @@ void getData() {
     if ( radio.available() ) {
         radio.read( &dataReceived, sizeof(dataReceived) );
         newData = true;
+<<<<<<< Updated upstream
+=======
+        mapped.yaw = map( dataReceived.yaw, 0, 255, -100, 100 );
+        mapped.pitch = map( dataReceived.pitch, 0, 255, -100, 100 );
+        mapped.roll = map( dataReceived.roll, 0, 255, -100, 100 );
+        mapped.throttle = map(dataReceived.throttle, 0, 255, 100, 800 );
+//        Serial.print("Before: ");
+//        Serial.print(mapped.yaw);
+//        Serial.print(mapped.pitch);
+//        Serial.print(mapped.roll);
+//        Serial.print(mapped.throttle);
+//        Serial.print("\n");
+>>>>>>> Stashed changes
     }
 }
 
