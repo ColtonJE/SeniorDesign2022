@@ -142,9 +142,13 @@ float previous_error[3] = {0, 0, 0}; // Last errors (used for derivative compone
 //float Ki[3] = {0.02, 0.03, 0.03}; // I coefficients in that order : Yaw, Pitch, Roll
 //float Kd[3] = {0, 15, 15};        // D coefficients in that order : Yaw, Pitch, Roll
 
-float Kp[3] = {0,0,0};    // P coefficients in that order : Yaw, Pitch, Roll
-float Ki[3] = {0,0,0}; // I coefficients in that order : Yaw, Pitch, Roll
-float Kd[3] = {0,0,0};        // D coefficients in that order : Yaw, Pitch, Roll
+//float Kp[3] = {3.0, 1.4, 1.4};    // P coefficients in that order : Yaw, Pitch, Roll
+//float Ki[3] = {0.02, 0.06, 0.06}; // I coefficients in that order : Yaw, Pitch, Roll
+//float Kd[3] = {0, 14, 14};        // D coefficients in that order : Yaw, Pitch, Roll
+
+float Kp[3] = {5,5,5};    // P coefficients in that order : Yaw, Pitch, Roll
+float Ki[3] = {1,1,1}; // I coefficients in that order : Yaw, Pitch, Roll
+float Kd[3] = {0,15,15};        // D coefficients in that order : Yaw, Pitch, Roll
 
 // ---------------------------------------------------------------------------
 /**
@@ -264,51 +268,51 @@ void getData() {
 
 
 void showData() {
-        Serial.println("\n+--------------------------------------------+");
-        Serial.print("Data received \n");
-        Serial.print(" Yaw: " );
-        Serial.print((int)dataReceived.yaw);
-        Serial.print(" Pitch: ");
-        Serial.print((int)dataReceived.pitch);
-        Serial.print(" Roll: ");
-        Serial.print((int)dataReceived.roll);
-        Serial.print(" Throttle: ");
-        Serial.print((int)dataReceived.throttle);
-        Serial.print("\n");
-
-        Serial.print((int)pulse_length[CHANNEL1]);
-        Serial.print(" ");
-        Serial.print((int)pulse_length[CHANNEL2]);
-        Serial.print(" ");
-        Serial.print((int)pulse_length[CHANNEL3]);
-        Serial.print(" ");
-        Serial.print((int)pulse_length[CHANNEL4]);
-        Serial.print("\n ");
-
-//     //Serial.println("Angle gyro values:");
-//     Serial.print(measures[YAW]);
-//     Serial.print("   ");
-//     Serial.print(measures[PITCH]);
-//     Serial.print("   ");
-//     Serial.print(measures[ROLL]);
-//     Serial.print("\n");
-
-//       Serial.print(pulse_length_esc1);
-//       Serial.print("   ");
-//       Serial.print(pulse_length_esc2);
-//       Serial.print("   ");
-//       Serial.print(pulse_length_esc3);
-//       Serial.print("   ");
-//       Serial.print(pulse_length_esc4);
-//       Serial.print("\n");
-
-    
-
-
-
-     Serial.print("Started: ");
-     Serial.print(isStarted());
-     Serial.println("\n+--------------------------------------------+\n");  
+//        Serial.println("\n+--------------------------------------------+");
+//        Serial.print("Data received \n");
+//        Serial.print(" Yaw: " );
+//        Serial.print((int)dataReceived.yaw);
+//        Serial.print(" Pitch: ");
+//        Serial.print((int)dataReceived.pitch);
+//        Serial.print(" Roll: ");
+//        Serial.print((int)dataReceived.roll);
+//        Serial.print(" Throttle: ");
+//        Serial.print((int)dataReceived.throttle);
+//        Serial.print("\n");
+//
+//        Serial.print((int)pulse_length[CHANNEL1]);
+//        Serial.print(" ");
+//        Serial.print((int)pulse_length[CHANNEL2]);
+//        Serial.print(" ");
+//        Serial.print((int)pulse_length[CHANNEL3]);
+//        Serial.print(" ");
+//        Serial.print((int)pulse_length[CHANNEL4]);
+//        Serial.print("\n ");
+//
+////     //Serial.println("Angle gyro values:");
+////     Serial.print(measures[YAW]);
+////     Serial.print("   ");
+////     Serial.print(measures[PITCH]);
+////     Serial.print("   ");
+////     Serial.print(measures[ROLL]);
+////     Serial.print("\n");
+//
+////       Serial.print(pulse_length_esc1);
+////       Serial.print("   ");
+////       Serial.print(pulse_length_esc2);
+////       Serial.print("   ");
+////       Serial.print(pulse_length_esc3);
+////       Serial.print("   ");
+////       Serial.print(pulse_length_esc4);
+////       Serial.print("\n");
+//
+//    
+//
+//
+//
+//     Serial.print("Started: ");
+//     Serial.print(isStarted());
+//     Serial.println("\n+--------------------------------------------+\n");  
       
 }
 
@@ -342,7 +346,7 @@ void applyMotorSpeed() {
 
         if (difference >= pulse_length_esc1+100) digitalWrite(30,LOW); 
         if (difference >= pulse_length_esc2-50) digitalWrite(32,LOW); 
-        if (difference >= pulse_length_esc3+175) digitalWrite(34,LOW); 
+        if (difference >= pulse_length_esc3+185) digitalWrite(34,LOW); 
         if (difference >= pulse_length_esc4-25) digitalWrite(36,LOW); 
     }
 
@@ -480,11 +484,22 @@ void pidController() {
         pulse_length_esc4 = throttle + roll_pid + pitch_pid + yaw_pid;
     }
 
+      
+
     // Prevent out-of-range-values
     pulse_length_esc1 = minMax(pulse_length_esc1, 1100, 2000);
     pulse_length_esc2 = minMax(pulse_length_esc2, 1100, 2000);
     pulse_length_esc3 = minMax(pulse_length_esc3, 1100, 2000);
     pulse_length_esc4 = minMax(pulse_length_esc4, 1100, 2000);
+
+     Serial.print(pulse_length_esc1);
+       Serial.print("   ");
+       Serial.print(pulse_length_esc2);
+       Serial.print("   ");
+       Serial.print(pulse_length_esc3);
+       Serial.print("   ");
+       Serial.print(pulse_length_esc4);
+       Serial.print("\n");
 }
 
 /**
@@ -570,44 +585,49 @@ void setupMpu6050Registers() {
  * This function might take ~2sec for 2000 samples.
  */
 void calibrateMpu6050() {
-//    int max_samples = 2000;
-//
-//    for (int i = 0; i < max_samples; i++) {
-//        readSensor();
-//
-//        gyro_offset[X] += gyro_raw[X];
-//        gyro_offset[Y] += gyro_raw[Y];
-//        gyro_offset[Z] += gyro_raw[Z];
-//
-//        // Generate low throttle pulse to init ESC and prevent them beeping
-//        digitalWrite(30,HIGH);
-//  digitalWrite(32,HIGH);
-//  digitalWrite(34,HIGH);
-//  digitalWrite(36,HIGH);
-//        //PORTD |= B01000000;
-//    //PORTA |= B10000000;
-//    //PORTC |= B00001010;
-//    delayMicroseconds(1000); // Wait 1000µs
-//    //PORTD &= B10111111;
-//    //PORTA &= B01111111;
-//    //PORTC &= B11110101;
-//        digitalWrite(30,LOW);
-//  digitalWrite(32,LOW);
-//  digitalWrite(34,LOW);
-//  digitalWrite(36,LOW);
-//
-//        // Just wait a bit before next loop
-//        delay(3);
-//    }
-//
-//    // Calculate average offsets
-//    gyro_offset[X] /= max_samples;
-//    gyro_offset[Y] /= max_samples;
-//    gyro_offset[Z] /= max_samples;
+    int max_samples = 2000;
 
-      gyro_offset[X] = 115;
-      gyro_offset[Y] = 27;
-      gyro_offset[Z] = 18;
+    for (int i = 0; i < max_samples; i++) {
+        readSensor();
+
+        gyro_offset[X] += gyro_raw[X];
+        gyro_offset[Y] += gyro_raw[Y];
+        gyro_offset[Z] += gyro_raw[Z];
+
+        // Generate low throttle pulse to init ESC and prevent them beeping
+        digitalWrite(30,HIGH);
+  digitalWrite(32,HIGH);
+  digitalWrite(34,HIGH);
+  digitalWrite(36,HIGH);
+        //PORTD |= B01000000;
+    //PORTA |= B10000000;
+    //PORTC |= B00001010;
+    delayMicroseconds(1000); // Wait 1000µs
+    //PORTD &= B10111111;
+    //PORTA &= B01111111;
+    //PORTC &= B11110101;
+        digitalWrite(30,LOW);
+  digitalWrite(32,LOW);
+  digitalWrite(34,LOW);
+  digitalWrite(36,LOW);
+
+        // Just wait a bit before next loop
+        delay(3);
+    }
+
+    // Calculate average offsets
+    gyro_offset[X] /= max_samples;
+    gyro_offset[Y] /= max_samples;
+    gyro_offset[Z] /= max_samples;
+
+//Serial.print(gyro_offset[X]);
+//Serial.print("\n");
+//Serial.print(gyro_offset[Y]);
+//Serial.print("\n");
+//Serial.print(gyro_offset[Z]);
+//      gyro_offset[X] = 115;
+//      gyro_offset[Y] = 27;
+//      gyro_offset[Z] = 18;
 
       delay(500);
 }
