@@ -3,12 +3,10 @@
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
-<<<<<<< Updated upstream
-=======
 #include <Servo.h>
 #include <Wire.h>
 //=================================================
->>>>>>> Stashed changes
+
 
 #define CE_PIN   9
 #define CSN_PIN 10
@@ -41,8 +39,6 @@ double gyro_offset[3];
 //===================================================
 
 void setup() {
-<<<<<<< Updated upstream
-=======
 
   // Start I2C communication
   Wire.begin();
@@ -67,7 +63,6 @@ void setup() {
   ESC_FR.attach(escFR);
   ESC_BL.attach(escBL);
   ESC_BR.attach(escBR);
->>>>>>> Stashed changes
 
     Serial.begin(9600);
 
@@ -81,8 +76,7 @@ void setup() {
 //=============
 
 void loop() {
-<<<<<<< Updated upstream
-=======
+
 
   getData();
   STARTSTOP();
@@ -129,7 +123,6 @@ void loop() {
     ESC_FL.writeMicroseconds(1000);
     ESC_BR.writeMicroseconds(1000);
     ESC_BL.writeMicroseconds(1000);
->>>>>>> Stashed changes
     getData();
     showData();
 }
@@ -150,8 +143,6 @@ void showData() {
         newData = false;
     }
 }
-<<<<<<< Updated upstream
-=======
 
 void STARTSTOP()
 {
@@ -243,4 +234,3 @@ void readSensor() {
 //    gyro_raw[Z] -= gyro_offset[Z];                                       //Only compensate after the calibration.
 //  }
 }
->>>>>>> Stashed changes
