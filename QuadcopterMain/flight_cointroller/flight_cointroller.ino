@@ -146,9 +146,9 @@ float previous_error[3] = {0, 0, 0}; // Last errors (used for derivative compone
 //float Ki[3] = {0.02, 0.06, 0.06}; // I coefficients in that order : Yaw, Pitch, Roll
 //float Kd[3] = {0, 14, 14};        // D coefficients in that order : Yaw, Pitch, Roll
 
-float Kp[3] = {5,5,5};    // P coefficients in that order : Yaw, Pitch, Roll
-float Ki[3] = {1,1,1}; // I coefficients in that order : Yaw, Pitch, Roll
-float Kd[3] = {0,15,15};        // D coefficients in that order : Yaw, Pitch, Roll
+float Kp[3] = {6,6,6};    // P coefficients in that order : Yaw, Pitch, Roll
+float Ki[3] = {1,0.8,0.8}; // I coefficients in that order : Yaw, Pitch, Roll
+float Kd[3] = {0,18,18};        // D coefficients in that order : Yaw, Pitch, Roll
 
 // ---------------------------------------------------------------------------
 /**
