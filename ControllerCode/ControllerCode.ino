@@ -82,5 +82,5 @@ void loop() {
 //  if(result) Serial.println( "ACK" );
 //  else Serial.println( "TxFailed" );
   //=======================================
-  delay(500);
+//  delay(500);
 }
