@@ -10,6 +10,10 @@
 #define CE_PIN   25
 #define CSN_PIN 23
 
+#define YAW_TRIM    -20
+#define PITCH_TRIM  50
+#define ROLL_TRIM   20
+
 const byte thisSlaveAddress[5] = {'R','x','A','A','A'};
 
 RF24 radio(CE_PIN, CSN_PIN);
@@ -93,8 +97,8 @@ void loop() {
 //  showData();
   
   M1 = mapped.throttle + mapped.yaw - mapped.pitch + mapped.roll;
-  M2 = mapped.throttle + mapped.yaw - mapped.pitch - mapped.roll;
-  M3 = mapped.throttle + mapped.yaw + mapped.pitch + mapped.roll;
+  M2 = mapped.throttle - mapped.yaw - mapped.pitch - mapped.roll;
+  M3 = mapped.throttle - mapped.yaw + mapped.pitch + mapped.roll;
   M4 = mapped.throttle + mapped.yaw + mapped.pitch - mapped.roll;
 
 //  Serial.print("After: ");
@@ -117,10 +121,10 @@ Serial.print("After: ");
   Serial.print(M4);
   Serial.print("\n");
   
-  ESC_FR.writeMicroseconds(1000 + minMax(M1,100,1000));
-  ESC_FL.writeMicroseconds(1000 + minMax(M1,100,1000)+100);
-  ESC_BR.writeMicroseconds(1000 + minMax(M1,100,1000));
-  ESC_BL.writeMicroseconds(1000 + minMax(M1,100,1000)+200);
+  ESC_FR.writeMicroseconds(1000 + minMax(M2,100,1000));
+  ESC_FL.writeMicroseconds(1000 + minMax(M1,100,1000));
+  ESC_BR.writeMicroseconds(1000 + minMax(M4,100,1000));
+  ESC_BL.writeMicroseconds(1000 + minMax(M3,100,1000));
   }
   else
   {
@@ -144,9 +148,9 @@ void getData() {
     if ( radio.available() ) {
         radio.read( &dataReceived, sizeof(dataReceived) );
         newData = true;
-        mapped.yaw = map( dataReceived.yaw, 0, 255, -100, 100 );
-        mapped.pitch = map( dataReceived.pitch, 0, 255, -100, 100 );
-        mapped.roll = map( dataReceived.roll, 0, 255, -100, 100 );
+        mapped.yaw = map( dataReceived.yaw+YAW_TRIM, 255, 0, -100, 100 );
+        mapped.pitch = map( (dataReceived.pitch+PITCH_TRIM), 255, 0, -100, 100 );
+        mapped.roll = map( dataReceived.roll+ROLL_TRIM, 0, 255, -100, 100 );
         mapped.throttle = map(dataReceived.throttle, 0, 255, 100, 800 );
 //        Serial.print("Before: ");
 //        Serial.print(mapped.yaw);
@@ -176,11 +180,11 @@ void showData() {
 
 void STARTSTOP()
 {
-    if(dataReceived.button_left == 0 && started == false)
+    if(dataReceived.button_right == 0 && started == false)
     {
        started = true;
     }
-    else if (dataReceived.button_right == 0 && started == true)
+    else if (dataReceived.button_left == 0 && started == true)
     {
        started = false;
     }
