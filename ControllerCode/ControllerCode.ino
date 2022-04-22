@@ -9,6 +9,8 @@
 //Pin definitions ==========================
 #define CE_PIN 9
 #define CSN_PIN 10
+#define LEFT 4
+#define RIGHT 2
 //==========================================
 
 //Controller Data Struct ===================
@@ -17,6 +19,8 @@ typedef struct {
   byte pitch;
   byte roll;
   byte throttle;
+  bool button_left;
+  bool button_right;
 }conData;
 //==========================================
 
@@ -42,6 +46,8 @@ void setup() {
   radio.setDataRate( RF24_250KBPS );
   radio.setRetries(3,5); // delay, count
   radio.openWritingPipe(slaveAddress);
+  pinMode(LEFT, INPUT_PULLUP);
+  pinMode(RIGHT, INPUT_PULLUP);
 }
 
 void loop() {
@@ -51,17 +57,23 @@ void loop() {
   sendData.pitch    = map( analogRead(A1), 0, 1024, 0, 255 ); 
   sendData.roll     = map( analogRead(A2), 0, 1024, 0, 255 );
   sendData.throttle = map( analogRead(A3), 0, 1024, 0, 255 ); //map values inverted because joystick is upside down
+  sendData.button_left = digitalRead(LEFT);
+  sendData.button_right = digitalRead(RIGHT);
   //For testing ============================
-  Serial.println("Conroller Data: ");
-  Serial.print("Yaw: " );
-  Serial.print((int)sendData.yaw);
-  Serial.print("\nPitch: ");
-  Serial.print((int)sendData.pitch);
-  Serial.print("\nRoll: ");
-  Serial.print((int)sendData.roll);
-  Serial.print("\nThrottle: ");
-  Serial.print((int)sendData.throttle);
-  Serial.print("\n");
+//  Serial.println("Conroller Data: ");
+//  Serial.print("Yaw: " );
+//  Serial.print((int)sendData.yaw);
+//  Serial.print("\nPitch: ");
+//  Serial.print((int)sendData.pitch);
+//  Serial.print("\nRoll: ");
+//  Serial.print((int)sendData.roll);
+//  Serial.print("\nThrottle: ");
+//  Serial.print((int)sendData.throttle);
+//  Serial.print("\n");
+    Serial.print(sendData.button_left);
+    Serial.print(" ");
+    Serial.print(sendData.button_right);
+    Serial.print("\n");
   //========================================
   //send data
   bool result;
@@ -70,5 +82,5 @@ void loop() {
 //  if(result) Serial.println( "ACK" );
 //  else Serial.println( "TxFailed" );
   //=======================================
-  delay(500);
+//  delay(500);
 }
