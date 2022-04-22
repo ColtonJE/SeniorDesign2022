@@ -100,26 +100,6 @@ void loop() {
   M2 = mapped.throttle - mapped.yaw - mapped.pitch - mapped.roll;
   M3 = mapped.throttle - mapped.yaw + mapped.pitch + mapped.roll;
   M4 = mapped.throttle + mapped.yaw + mapped.pitch - mapped.roll;
-
-//  Serial.print("After: ");
-//  Serial.print(1000 + minMax(M1,100,1000));
-//  Serial.print(" ");
-//  Serial.print(1000 + minMax(M2,100,1000));
-//  Serial.print(" ");
-//  Serial.print(1000 + minMax(M3,100,1000));
-//  Serial.print(" ");
-//  Serial.print(1000 + minMax(M4,100,1000));
-//  Serial.print("\n");
-
-Serial.print("After: ");
-  Serial.print(M1);
-  Serial.print(" ");
-  Serial.print(M2);
-  Serial.print(" ");
-  Serial.print(M3);
-  Serial.print(" ");
-  Serial.print(M4);
-  Serial.print("\n");
   
   ESC_FR.writeMicroseconds(1000 + minMax(M2,100,1000));
   ESC_FL.writeMicroseconds(1000 + minMax(M1,100,1000));
@@ -152,12 +132,6 @@ void getData() {
         mapped.pitch = map( (dataReceived.pitch+PITCH_TRIM), 255, 0, -100, 100 );
         mapped.roll = map( dataReceived.roll+ROLL_TRIM, 0, 255, -100, 100 );
         mapped.throttle = map(dataReceived.throttle, 0, 255, 100, 800 );
-//        Serial.print("Before: ");
-//        Serial.print(mapped.yaw);
-//        Serial.print(mapped.pitch);
-//        Serial.print(mapped.roll);
-//        Serial.print(mapped.throttle);
-//        Serial.print("\n");
     }
 }
 
@@ -173,6 +147,33 @@ void showData() {
         Serial.print("\nThrottle: ");
         Serial.print((int)dataReceived.throttle);
         Serial.print("\n");
+      
+//        Serial.print("Before: ");
+//        Serial.print(mapped.yaw);
+//        Serial.print(mapped.pitch);
+//        Serial.print(mapped.roll);
+//        Serial.print(mapped.throttle);
+//        Serial.print("\n");
+      
+//  Serial.print("After: ");
+//  Serial.print(1000 + minMax(M1,100,1000));
+//  Serial.print(" ");
+//  Serial.print(1000 + minMax(M2,100,1000));
+//  Serial.print(" ");
+//  Serial.print(1000 + minMax(M3,100,1000));
+//  Serial.print(" ");
+//  Serial.print(1000 + minMax(M4,100,1000));
+//  Serial.print("\n");
+
+// Serial.print("After: ");
+//   Serial.print(M1);
+//   Serial.print(" ");
+//   Serial.print(M2);
+//   Serial.print(" ");
+//   Serial.print(M3);
+//   Serial.print(" ");
+//   Serial.print(M4);
+//   Serial.print("\n");
         
         newData = false;
     }
