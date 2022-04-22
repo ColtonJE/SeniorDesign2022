@@ -59,7 +59,7 @@ Servo ESC_BR;
 //===================================================
 
 void setup() {
-  // Radio =========================================
+  //Radio Setup =========================================
   Serial.begin(9600);
 
   Serial.println("SimpleRx Starting");
@@ -85,7 +85,7 @@ void setup() {
   //================================================
 }
 
-//=============
+
 
 void loop() {
 
@@ -118,11 +118,8 @@ void loop() {
     STARTSTOP();
     }
   }
-
-//  Serial.println( 
 }
 
-//==============
 
 void getData() {
     if ( radio.available() ) {
