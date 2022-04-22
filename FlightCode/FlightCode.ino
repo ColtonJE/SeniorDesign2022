@@ -145,32 +145,35 @@ void showData() {
         Serial.print((int)dataReceived.throttle);
         Serial.print("\n");
       
-//        Serial.print("Before: ");
+
 //        Serial.print(mapped.yaw);
+//        Serial.print(" ");
 //        Serial.print(mapped.pitch);
+//        Serial.print(" ");
 //        Serial.print(mapped.roll);
+//        Serial.print(" ");
 //        Serial.print(mapped.throttle);
 //        Serial.print("\n");
       
-//  Serial.print("After: ");
-//  Serial.print(1000 + minMax(M1,100,1000));
-//  Serial.print(" ");
-//  Serial.print(1000 + minMax(M2,100,1000));
-//  Serial.print(" ");
-//  Serial.print(1000 + minMax(M3,100,1000));
-//  Serial.print(" ");
-//  Serial.print(1000 + minMax(M4,100,1000));
-//  Serial.print("\n");
 
-// Serial.print("After: ");
-//   Serial.print(M1);
-//   Serial.print(" ");
-//   Serial.print(M2);
-//   Serial.print(" ");
-//   Serial.print(M3);
-//   Serial.print(" ");
-//   Serial.print(M4);
-//   Serial.print("\n");
+//        Serial.print(1000 + minMax(M1,100,1000));
+//        Serial.print(" ");
+//        Serial.print(1000 + minMax(M2,100,1000));
+//        Serial.print(" ");
+//        Serial.print(1000 + minMax(M3,100,1000));
+//        Serial.print(" ");
+//        Serial.print(1000 + minMax(M4,100,1000));
+//        Serial.print("\n");
+
+
+//        Serial.print(M1);
+//        Serial.print(" ");
+//        Serial.print(M2);
+//        Serial.print(" ");
+//        Serial.print(M3);
+//        Serial.print(" ");
+//        Serial.print(M4);
+//        Serial.print("\n");
         
         newData = false;
     }
