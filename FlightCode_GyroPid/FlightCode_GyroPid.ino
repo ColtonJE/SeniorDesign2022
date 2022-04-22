@@ -1,16 +1,7 @@
-//things to try
-//-remove battery drop compensate, could be affecting esc pulse width because our battery is different DONE
-//-check esc orientation 1-4 DONE
-//-verify mpu6050 configurations are correct DONE
-//-setting gyro offsets initially (i have a pic) DONE
-//-edit filters used in calculations DONE
-//-set the struct = to another struct instance for a placeholder each time done
-
 #include <Wire.h>
 
 //Rx libraries
 #include <SPI.h>
-//#include <nRF24L01.h>
 #include <RF24.h>
 
 #define CE_PIN   25
@@ -225,7 +216,7 @@ void loop() {
         // 5. Calculate motors speed with PID controller
         pidController();
 
-        compensateBatteryDrop();
+        //compensateBatteryDrop();
     }
 
     // 6. Apply motors speed
@@ -259,15 +250,6 @@ void showData() {
         Serial.print(" Throttle: ");
         Serial.print((int)dataReceived.throttle);
         Serial.print("\n");
-
-        Serial.print((int)pulse_length[CHANNEL1]);
-        Serial.print(" ");
-     Serial.print((int)pulse_length[CHANNEL2]);
-     Serial.print(" ");
-     Serial.print((int)pulse_length[CHANNEL3]);
-     Serial.print(" ");
-     Serial.print((int)pulse_length[CHANNEL4]);
-     Serial.print("\n ");
 
 //     Serial.println("Angle gyro values:");
 //     Serial.print(gyro_angle[X]);
@@ -552,20 +534,16 @@ void calibrateMpu6050() {
 
         // Generate low throttle pulse to init ESC and prevent them beeping
         digitalWrite(30,HIGH);
-  digitalWrite(32,HIGH);
-  digitalWrite(34,HIGH);
-  digitalWrite(36,HIGH);
-        //PORTD |= B01000000;
-    //PORTA |= B10000000;
-    //PORTC |= B00001010;
-    delayMicroseconds(1000); // Wait 1000µs
-    //PORTD &= B10111111;
-    //PORTA &= B01111111;
-    //PORTC &= B11110101;
+        digitalWrite(32,HIGH);
+        digitalWrite(34,HIGH);
+        digitalWrite(36,HIGH);
+
+        delayMicroseconds(1000); // Wait 1000µs
+
         digitalWrite(30,LOW);
-  digitalWrite(32,LOW);
-  digitalWrite(34,LOW);
-  digitalWrite(36,LOW);
+        digitalWrite(32,LOW);
+        digitalWrite(34,LOW);
+        digitalWrite(36,LOW);
 
         // Just wait a bit before next loop
         delay(3);
@@ -576,9 +554,6 @@ void calibrateMpu6050() {
     gyro_offset[Y] /= max_samples;
     gyro_offset[Z] /= max_samples;
 
-//      gyro_offset[X] = 115;
-//      gyro_offset[Y] = 27;
-//      gyro_offset[Z] = 18;
 }
 
 /**
